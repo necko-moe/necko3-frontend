@@ -1,5 +1,12 @@
 const BACKEND_URL = (import.meta.env.VITE_BACKEND_URL as string) ?? "";
 
+let unauthorizedHandler: (() => void) | null = null;
+
+/** Called from AuthProvider so 401 responses clear the session key and reopen the login dialog. */
+export function setUnauthorizedHandler(handler: (() => void) | null) {
+  unauthorizedHandler = handler;
+}
+
 export interface ApiResponse<T> {
   status: "success" | "error";
   data?: T;
@@ -19,6 +26,10 @@ export async function apiFetch<T>(
       ...init?.headers,
     },
   });
+
+  if (res.status === 401) {
+    unauthorizedHandler?.();
+  }
 
   if (!res.ok) {
     let message = `HTTP ${res.status}`;

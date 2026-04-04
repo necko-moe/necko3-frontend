@@ -2,10 +2,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
 } from "react";
+import { setUnauthorizedHandler } from "@/lib/api";
 
 interface AuthContextValue {
   apiKey: string | null;
@@ -31,6 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem(STORAGE_KEY);
     setApiKeyState(null);
   }, []);
+
+  useEffect(() => {
+    setUnauthorizedHandler(clearApiKey);
+    return () => setUnauthorizedHandler(null);
+  }, [clearApiKey]);
 
   const value = useMemo(
     () => ({ apiKey, setApiKey, clearApiKey }),
