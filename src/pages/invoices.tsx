@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { toast } from "sonner";
-import type { ChainConfigSchema } from "@/types/chain";
+import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
 import type { InvoiceSchema, InvoiceStatus, PaginatedResponse } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch, apiFetchSilent } from "@/lib/api";
@@ -45,6 +45,8 @@ export function InvoicesPage() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [chains, setChains] = useState<ChainConfigSchema[]>([]);
+  const [filterTokens, setFilterTokens] = useState<TokenConfigSchema[]>([]);
+  const [filterTokensLoading, setFilterTokensLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
   const [selectedInvoice, setSelectedInvoice] = useState<InvoiceSchema | null>(
@@ -83,6 +85,60 @@ export function InvoicesPage() {
   useEffect(() => {
     fetchChains();
   }, [fetchChains]);
+
+  useEffect(() => {
+    if (!networkFilter || !apiKey) {
+      setFilterTokens([]);
+      setFilterTokensLoading(false);
+      return;
+    }
+    setFilterTokensLoading(true);
+    apiFetchSilent<TokenConfigSchema[]>(
+      `/chain/${encodeURIComponent(networkFilter)}/token`,
+      apiKey,
+    ).then((res) => {
+      if (res?.status === "success" && res.data) {
+        setFilterTokens(res.data);
+      } else {
+        setFilterTokens([]);
+      }
+      setFilterTokensLoading(false);
+    });
+  }, [networkFilter, apiKey]);
+
+  useEffect(() => {
+    if (!networkFilter && tokenFilter) {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("token");
+        next.delete("page");
+        return next;
+      });
+    }
+  }, [networkFilter, tokenFilter, setSearchParams]);
+
+  useEffect(() => {
+    if (
+      !networkFilter ||
+      filterTokensLoading ||
+      !tokenFilter ||
+      filterTokens.some((t) => t.symbol === tokenFilter)
+    ) {
+      return;
+    }
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.delete("token");
+      next.delete("page");
+      return next;
+    });
+  }, [
+    networkFilter,
+    tokenFilter,
+    filterTokens,
+    filterTokensLoading,
+    setSearchParams,
+  ]);
 
   const chainNames = useMemo(
     () => chains.map((c) => c.name).sort(),
@@ -242,12 +298,22 @@ export function InvoicesPage() {
 
         <Select
           value={networkFilter || "__all__"}
-          onValueChange={(v) => setParam("network", v === "__all__" ? "" : v)}
+          onValueChange={(v) => {
+            const net = v === "__all__" ? "" : v;
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev);
+              if (net) next.set("network", net);
+              else next.delete("network");
+              next.delete("token");
+              next.delete("page");
+              return next;
+            });
+          }}
         >
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All Networks" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper" sideOffset={4}>
             <SelectItem value="__all__">All Networks</SelectItem>
             {chainNames.map((name) => (
               <SelectItem key={name} value={name}>
@@ -260,12 +326,26 @@ export function InvoicesPage() {
         <Select
           value={tokenFilter || "__all__"}
           onValueChange={(v) => setParam("token", v === "__all__" ? "" : v)}
+          disabled={!networkFilter || filterTokensLoading}
         >
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="All Tokens" />
+            <SelectValue
+              placeholder={
+                networkFilter
+                  ? filterTokensLoading
+                    ? "Loading…"
+                    : "All Tokens"
+                  : "Network first"
+              }
+            />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper" sideOffset={4}>
             <SelectItem value="__all__">All Tokens</SelectItem>
+            {filterTokens.map((t) => (
+              <SelectItem key={t.symbol} value={t.symbol}>
+                {t.symbol}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 

@@ -163,12 +163,19 @@ export function CreateInvoiceDialog({
                 <Loader2 className="size-4 animate-spin" />
                 Loading chains...
               </div>
+            ) : chains.length === 0 ? (
+              <p className="rounded-lg border border-dashed border-border/80 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
+                No active networks. Add a chain in Chains first.
+              </p>
             ) : (
-              <Select value={network} onValueChange={setNetwork}>
+              <Select
+                value={network || undefined}
+                onValueChange={setNetwork}
+              >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select network" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
                   {chains.map((c) => (
                     <SelectItem key={c.name} value={c.name}>
                       {c.name}
@@ -188,7 +195,7 @@ export function CreateInvoiceDialog({
               </div>
             ) : (
               <Select
-                value={token}
+                value={token || undefined}
                 onValueChange={setToken}
                 disabled={!network}
               >
@@ -199,7 +206,7 @@ export function CreateInvoiceDialog({
                     }
                   />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="z-[100]">
                   {tokens.map((t) => (
                     <SelectItem key={t.symbol} value={t.symbol}>
                       {t.symbol}
