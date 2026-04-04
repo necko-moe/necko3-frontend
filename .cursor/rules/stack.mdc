@@ -1,0 +1,62 @@
+---
+description: Core stack, architecture, and non-negotiable project constraints for this frontend repository.
+globs:
+alwaysApply: true
+---
+
+# Frontend stack
+
+This repository uses:
+- React
+- Vite
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- Static build output only
+
+## Core constraints
+
+- Preserve the existing Vite + TypeScript + Tailwind + shadcn/ui setup.
+- Assume the backend already exists; frontend must consume external APIs only.
+- Do not add server-side code, API routes, server actions, or backend logic inside this repo.
+- Keep the app compatible with static hosting and production build output.
+- Prefer simple client-side architecture over framework-specific magic.
+
+## Source of truth
+
+- Treat existing project configuration as intentional unless explicitly told otherwise.
+- Do not rewrite project setup files just to “simplify” them.
+- Do not replace the styling system with another library.
+- Keep the current import alias style using @/*.
+- Prefer minimal, targeted edits over broad rewrites.
+
+## Styling rules
+
+- Tailwind CSS is the primary styling method.
+- shadcn/ui is the default component foundation.
+- Reuse existing primitives before creating custom replacements.
+- Do not remove shadcn/ui utilities, theme tokens, or generated helpers unless explicitly asked.
+- Assume global CSS may contain required Tailwind/shadcn foundation and theme variables.
+
+## File editing priorities
+
+When implementing UI, prefer editing in this order:
+1. Feature/page components.
+2. Reusable UI components.
+3. Routing/layout files.
+4. Global styling files only if truly necessary.
+
+## Safety rules
+
+- Never delete files only because they look unused without checking imports and project role.
+- Do not aggressively “clean up” starter files unless explicitly asked to do cleanup.
+- If a requested change may affect global styling, routing, aliases, or build config, explain the impact in the response before making broad edits.
+- For first-pass implementation, stop after a coherent diff rather than continuing into speculative cleanup.
+
+## Build discipline
+
+Before finishing a substantial task:
+- run typecheck if available;
+- run build;
+- fix introduced errors;
+- avoid unrelated refactors.

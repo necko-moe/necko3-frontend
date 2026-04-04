@@ -1,0 +1,48 @@
+---
+description: Guardrails for UI work so the agent does not overwrite global styling, shadcn foundation, or project structure during frontend tasks.
+globs: src/**/*.ts,src/**/*.tsx,src/**/*.css
+alwaysApply: false
+---
+# UI guardrails
+
+Apply this rule whenever working on pages, components, layout, styling, theming, or visual refactors.
+
+## Do not break foundation
+
+- Do not overwrite `src/index.css` with a minimal reset unless explicitly asked.
+- Do not remove Tailwind imports, shadcn-related styles, theme variables, or animation utilities without confirmation.
+- Do not remove `tw-animate-css`, `utils.ts`, or alias-based imports unless confirmed unused and safe.
+- Do not delete starter files as a side effect of a UI task unless the task explicitly requests cleanup.
+
+## Preferred workflow
+
+- Make additive changes first.
+- Preserve working foundation and layer new UI on top.
+- Modify only the files needed for the requested screen or feature.
+- Keep diffs small and reviewable.
+- When possible, complete one screen/feature at a time.
+
+## Implementation style
+
+- Build production-looking UI, not placeholder toy layouts.
+- Prefer clean spacing, strong hierarchy, restrained color usage, and good dark-mode defaults.
+- Use shadcn/ui primitives for dialogs, sheets, dropdowns, popovers, tabs, buttons, inputs, tables, cards, badges, and forms.
+- Keep components composable and split large screens into smaller sections.
+
+## Component management
+- Before importing any shadcn/ui component, verify if it exists in `@/components/ui`.
+- If a required shadcn/ui component is missing, you MUST run `npx shadcn@latest add <component-name>` in the terminal before using it in the code.
+- Do not try to manually create shadcn/ui primitives by copy-pasting code from the web; always use the CLI to ensure all dependencies (Radix, Lucide, etc.) are installed correctly.
+
+## When asked to simplify
+
+If the user asks to “simplify” something:
+- simplify the feature implementation, not the project foundation;
+- keep Tailwind + shadcn/ui setup intact;
+- avoid touching global config unless necessary.
+
+## Before completion
+
+- Show the diff through the normal workflow.
+- Summarize which files were changed.
+- Mention if any global CSS or config file was edited and why.
