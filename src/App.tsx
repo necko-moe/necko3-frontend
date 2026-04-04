@@ -3,6 +3,7 @@ import { Toaster } from "sonner";
 import { AuthProvider } from "@/context/auth-context";
 import { AuthGate } from "@/components/auth-gate";
 import { AppLayout } from "@/components/layout/app-layout";
+import { ThemeProvider } from "@/hooks/use-theme";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { GettingStartedPage } from "@/pages/getting-started";
 import { ChainsPage } from "@/pages/chains";
@@ -12,6 +13,7 @@ import { WebhooksPage } from "@/pages/webhooks";
 
 export function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
       <Toaster
         position="bottom-right"
@@ -41,5 +43,6 @@ export function App() {
         </TooltipProvider>
       </AuthProvider>
     </BrowserRouter>
+    </ThemeProvider>
   );
 }

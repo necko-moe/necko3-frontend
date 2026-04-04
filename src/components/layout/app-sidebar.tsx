@@ -6,11 +6,14 @@ import {
   CreditCard,
   Webhook,
   LogOut,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
+import { useTheme } from "@/hooks/use-theme";
 
 const navItems = [
   { to: "/getting-started", label: "Getting Started", icon: Rocket },
@@ -22,6 +25,7 @@ const navItems = [
 
 export function AppSidebar() {
   const { clearApiKey } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <aside className="flex h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar">
@@ -56,10 +60,19 @@ export function AppSidebar() {
         ))}
       </nav>
 
-      <div className="px-3 pb-4">
+      <div className="flex items-center gap-1 px-3 pb-4">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-3 text-sidebar-foreground/60 hover:text-sidebar-foreground"
+          size="icon"
+          className="shrink-0 text-sidebar-foreground/60 hover:text-sidebar-foreground"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+        </Button>
+        <Button
+          variant="ghost"
+          className="flex-1 justify-start gap-3 text-sidebar-foreground/60 hover:text-sidebar-foreground"
           onClick={clearApiKey}
         >
           <LogOut className="size-4" />

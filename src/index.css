@@ -97,6 +97,32 @@
     --sidebar-ring: var(--color-cool-teal);
 }
 
+.dark {
+    /* warm palette — inverted */
+    --color-warm-lightest: #141210;
+    --color-warm-cream: #1e1a16;
+    --color-warm-sand: #413a34;
+    --color-warm-stone: #a09588;
+    --color-warm-bark: #ede5dc;
+
+    /* cool palette — inverted */
+    --color-cool-deep: #9acad6;
+    --color-cool-teal: #6ab3bf;
+    --color-cool-ice: #1a3842;
+    --color-cool-mint: #2a4420;
+
+    /* semantic overrides that don't cascade from palette swap */
+    --primary-foreground: var(--color-warm-cream);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: var(--color-warm-stone);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: var(--color-warm-stone);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
