@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { WebhookSchema, WebhookStatus, WebhookEventType } from "@/types/webhook";
 import type { PaginatedResponse } from "@/types/invoice";
@@ -33,15 +34,16 @@ const STATUSES: WebhookStatus[] = [
   "Failed",
   "Cancelled",
 ];
-const EVENT_TYPES: { value: WebhookEventType; label: string }[] = [
-  { value: "tx_detected", label: "Tx Detected" },
-  { value: "tx_confirmed", label: "Tx Confirmed" },
-  { value: "invoice_paid", label: "Invoice Paid" },
-  { value: "invoice_expired", label: "Invoice Expired" },
+const EVENT_TYPES: WebhookEventType[] = [
+  "tx_detected",
+  "tx_confirmed",
+  "invoice_paid",
+  "invoice_expired",
 ];
 
 export function WebhooksPage() {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? "1");
@@ -131,7 +133,7 @@ export function WebhooksPage() {
         apiKey,
       );
       if (res.status === "error") {
-        const msg = res.message ?? "Could not load webhook";
+        const msg = res.message ?? t("webhooks.failedToLoad");
         if (everLoaded.current) {
           toast.error(msg);
         } else {
@@ -146,14 +148,14 @@ export function WebhooksPage() {
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      const msg = err instanceof Error ? err.message : "Unexpected error";
+      const msg = err instanceof Error ? err.message : t("common.unexpectedError");
       if (everLoaded.current) {
         toast.error(msg);
       } else {
         setDetailError(msg);
       }
     }
-  }, [apiKey, selectedId]);
+  }, [apiKey, selectedId, t]);
 
   useEffect(() => {
     fetchSingleWebhook();
@@ -218,17 +220,17 @@ export function WebhooksPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
         <h1 className="font-heading text-3xl font-bold tracking-tight">
-          Webhooks
+          {t("webhooks.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Track webhook delivery status and retry history.
+          {t("webhooks.subtitle")}
         </p>
       </header>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="Invoice ID..."
+          placeholder={t("webhooks.invoiceId")}
           value={invoiceIdFilter}
           onChange={(e) => setParam("invoice_id", e.target.value)}
           className="w-48"
@@ -241,20 +243,20 @@ export function WebhooksPage() {
           }
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Events" />
+            <SelectValue placeholder={t("common.allEvents")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Events</SelectItem>
+            <SelectItem value="__all__">{t("common.allEvents")}</SelectItem>
             {EVENT_TYPES.map((et) => (
-              <SelectItem key={et.value} value={et.value}>
-                {et.label}
+              <SelectItem key={et} value={et}>
+                {t("webhooks.event." + et)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <Input
-          placeholder="URL..."
+          placeholder={t("webhooks.url")}
           value={urlFilter}
           onChange={(e) => setParam("url", e.target.value)}
           className="w-48"
@@ -265,13 +267,13 @@ export function WebhooksPage() {
           onValueChange={(v) => setParam("status", v === "__all__" ? "" : v)}
         >
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder={t("common.allStatuses")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Statuses</SelectItem>
+            <SelectItem value="__all__">{t("common.allStatuses")}</SelectItem>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {s}
+                {t("status." + s)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -280,7 +282,7 @@ export function WebhooksPage() {
         {hasFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <RotateCcw className="size-3.5" />
-            Clear
+            {t("common.clear")}
           </Button>
         )}
       </div>
@@ -298,7 +300,7 @@ export function WebhooksPage() {
       {!loading && total > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {total} webhook{total !== 1 && "s"} total
+            {t("webhooks.total", { count: total })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -308,10 +310,10 @@ export function WebhooksPage() {
               onClick={() => setParam("page", String(page - 1))}
             >
               <ChevronLeft className="size-4" />
-              Previous
+              {t("common.previous")}
             </Button>
             <span className="text-sm text-muted-foreground">
-              Page {page} of {totalPages}
+              {t("common.pageOf", { page, totalPages })}
             </span>
             <Button
               variant="outline"
@@ -319,7 +321,7 @@ export function WebhooksPage() {
               disabled={page >= totalPages}
               onClick={() => setParam("page", String(page + 1))}
             >
-              Next
+              {t("common.next")}
               <ChevronRight className="size-4" />
             </Button>
           </div>

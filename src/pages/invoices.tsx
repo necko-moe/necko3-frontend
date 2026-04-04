@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
 import type { InvoiceSchema, InvoiceStatus, PaginatedResponse } from "@/types/invoice";
@@ -31,6 +32,7 @@ const PAGE_SIZE = 20;
 const STATUSES: InvoiceStatus[] = ["Pending", "Paid", "Expired", "Cancelled"];
 
 export function InvoicesPage() {
+  const { t } = useTranslation();
   const { apiKey } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -122,7 +124,7 @@ export function InvoicesPage() {
       !networkFilter ||
       filterTokensLoading ||
       !tokenFilter ||
-      filterTokens.some((t) => t.symbol === tokenFilter)
+      filterTokens.some((tk) => tk.symbol === tokenFilter)
     ) {
       return;
     }
@@ -193,7 +195,7 @@ export function InvoicesPage() {
         apiKey,
       );
       if (res.status === "error") {
-        const msg = res.message ?? "Could not load invoice";
+        const msg = res.message ?? t("invoices.failedToLoad");
         if (everLoaded.current) {
           toast.error(msg);
         } else {
@@ -208,14 +210,14 @@ export function InvoicesPage() {
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      const msg = err instanceof Error ? err.message : "Unexpected error";
+      const msg = err instanceof Error ? err.message : t("common.unexpectedError");
       if (everLoaded.current) {
         toast.error(msg);
       } else {
         setDetailError(msg);
       }
     }
-  }, [apiKey, selectedId]);
+  }, [apiKey, selectedId, t]);
 
   useEffect(() => {
     fetchSingleInvoice();
@@ -280,17 +282,17 @@ export function InvoicesPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
         <h1 className="font-heading text-3xl font-bold tracking-tight">
-          Invoices
+          {t("invoices.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Create and manage payment invoices.
+          {t("invoices.subtitle")}
         </p>
       </header>
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="Filter by address..."
+          placeholder={t("invoices.filterByAddress")}
           value={addressFilter}
           onChange={(e) => setParam("address", e.target.value)}
           className="w-48"
@@ -311,10 +313,10 @@ export function InvoicesPage() {
           }}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Networks" />
+            <SelectValue placeholder={t("common.allNetworks")} />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="__all__">All Networks</SelectItem>
+            <SelectItem value="__all__">{t("common.allNetworks")}</SelectItem>
             {chainNames.map((name) => (
               <SelectItem key={name} value={name}>
                 {name}
@@ -333,17 +335,17 @@ export function InvoicesPage() {
               placeholder={
                 networkFilter
                   ? filterTokensLoading
-                    ? "Loading…"
-                    : "All Tokens"
-                  : "Network first"
+                    ? t("common.loading")
+                    : t("common.allTokens")
+                  : t("invoices.networkFirst")
               }
             />
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
-            <SelectItem value="__all__">All Tokens</SelectItem>
-            {filterTokens.map((t) => (
-              <SelectItem key={t.symbol} value={t.symbol}>
-                {t.symbol}
+            <SelectItem value="__all__">{t("common.allTokens")}</SelectItem>
+            {filterTokens.map((tk) => (
+              <SelectItem key={tk.symbol} value={tk.symbol}>
+                {tk.symbol}
               </SelectItem>
             ))}
           </SelectContent>
@@ -354,13 +356,13 @@ export function InvoicesPage() {
           onValueChange={(v) => setParam("status", v === "__all__" ? "" : v)}
         >
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder={t("common.allStatuses")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Statuses</SelectItem>
+            <SelectItem value="__all__">{t("common.allStatuses")}</SelectItem>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {s}
+                {t("status." + s)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -369,7 +371,7 @@ export function InvoicesPage() {
         {hasFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <RotateCcw className="size-3.5" />
-            Clear
+            {t("common.clear")}
           </Button>
         )}
 
@@ -377,7 +379,7 @@ export function InvoicesPage() {
 
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="size-4" />
-          Create Invoice
+          {t("invoices.createInvoice")}
         </Button>
       </div>
 
@@ -394,7 +396,7 @@ export function InvoicesPage() {
       {!loading && total > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {total} invoice{total !== 1 && "s"} total
+            {t("invoices.total", { count: total })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -404,10 +406,10 @@ export function InvoicesPage() {
               onClick={() => setParam("page", String(page - 1))}
             >
               <ChevronLeft className="size-4" />
-              Previous
+              {t("common.previous")}
             </Button>
             <span className="text-sm text-muted-foreground">
-              Page {page} of {totalPages}
+              {t("common.pageOf", { page, totalPages })}
             </span>
             <Button
               variant="outline"
@@ -415,7 +417,7 @@ export function InvoicesPage() {
               disabled={page >= totalPages}
               onClick={() => setParam("page", String(page + 1))}
             >
-              Next
+              {t("common.next")}
               <ChevronRight className="size-4" />
             </Button>
           </div>

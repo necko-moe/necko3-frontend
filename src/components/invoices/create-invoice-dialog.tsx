@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
 import type { CreateInvoiceReq } from "@/types/invoice";
@@ -36,6 +37,7 @@ export function CreateInvoiceDialog({
   onOpenChange,
   onCreated,
 }: CreateInvoiceDialogProps) {
+  const { t } = useTranslation();
   const { apiKey } = useAuth();
 
   const [chains, setChains] = useState<ChainConfigSchema[]>([]);
@@ -133,13 +135,13 @@ export function CreateInvoiceDialog({
         body: JSON.stringify(body),
       });
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to create invoice");
+        toast.error(res.message ?? t("invoices.create.failedToCreate"));
         return;
       }
       handleClose(false);
       onCreated();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setSubmitting(false);
     }
@@ -149,23 +151,23 @@ export function CreateInvoiceDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Invoice</DialogTitle>
+          <DialogTitle>{t("invoices.create.title")}</DialogTitle>
           <DialogDescription>
-            Create a new payment invoice. It cannot be edited after creation.
+            {t("invoices.create.description")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Network *</Label>
+            <Label>{t("invoices.create.network")}</Label>
             {chainsLoading ? (
               <div className="flex h-8 items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" />
-                Loading chains...
+                {t("invoices.create.loadingChains")}
               </div>
             ) : chains.length === 0 ? (
               <p className="rounded-lg border border-dashed border-border/80 bg-muted/30 px-3 py-2 text-sm text-muted-foreground">
-                No active networks. Add a chain in Chains first.
+                {t("invoices.create.noActiveNetworks")}
               </p>
             ) : (
               <Select
@@ -173,7 +175,7 @@ export function CreateInvoiceDialog({
                 onValueChange={setNetwork}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select network" />
+                  <SelectValue placeholder={t("invoices.create.selectNetwork")} />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4} className="z-[100]">
                   {chains.map((c) => (
@@ -187,11 +189,11 @@ export function CreateInvoiceDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Token *</Label>
+            <Label>{t("invoices.create.token")}</Label>
             {tokensLoading ? (
               <div className="flex h-8 items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="size-4 animate-spin" />
-                Loading tokens...
+                {t("invoices.create.loadingTokens")}
               </div>
             ) : (
               <Select
@@ -202,14 +204,14 @@ export function CreateInvoiceDialog({
                 <SelectTrigger className="w-full">
                   <SelectValue
                     placeholder={
-                      network ? "Select token" : "Select network first"
+                      network ? t("invoices.create.selectToken") : t("invoices.create.selectNetworkFirst")
                     }
                   />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4} className="z-[100]">
-                  {tokens.map((t) => (
-                    <SelectItem key={t.symbol} value={t.symbol}>
-                      {t.symbol}
+                  {tokens.map((tk) => (
+                    <SelectItem key={tk.symbol} value={tk.symbol}>
+                      {tk.symbol}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -218,7 +220,7 @@ export function CreateInvoiceDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Amount *</Label>
+            <Label>{t("invoices.create.amount")}</Label>
             <Input
               required
               type="text"
@@ -230,7 +232,7 @@ export function CreateInvoiceDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Expire After (minutes)</Label>
+            <Label>{t("invoices.create.expireAfter")}</Label>
             <Input
               type="number"
               min={0}
@@ -240,7 +242,7 @@ export function CreateInvoiceDialog({
               placeholder="15"
             />
             <p className="text-xs text-muted-foreground">
-              Leave empty for the server default.
+              {t("invoices.create.leaveEmpty")}
             </p>
           </div>
 
@@ -251,7 +253,7 @@ export function CreateInvoiceDialog({
             className="flex w-full items-center justify-between text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             onClick={() => setWebhookOpen((v) => !v)}
           >
-            Webhook Settings (optional)
+            {t("invoices.create.webhookSettings")}
             {webhookOpen ? (
               <ChevronUp className="size-4" />
             ) : (
@@ -262,7 +264,7 @@ export function CreateInvoiceDialog({
           {webhookOpen && (
             <div className="space-y-4 rounded-lg border border-border/50 bg-muted/30 p-3">
               <div className="space-y-1.5">
-                <Label>Webhook URL</Label>
+                <Label>{t("invoices.create.webhookUrl")}</Label>
                 <Input
                   type="url"
                   value={webhookUrl}
@@ -272,7 +274,7 @@ export function CreateInvoiceDialog({
               </div>
 
               <div className="space-y-1.5">
-                <Label>Webhook Secret</Label>
+                <Label>{t("invoices.create.webhookSecret")}</Label>
                 <Input
                   type="text"
                   value={webhookSecret}
@@ -283,7 +285,7 @@ export function CreateInvoiceDialog({
               </div>
 
               <div className="space-y-1.5">
-                <Label>Max Retries</Label>
+                <Label>{t("invoices.create.maxRetries")}</Label>
                 <Input
                   type="number"
                   min={0}
@@ -302,13 +304,13 @@ export function CreateInvoiceDialog({
               onClick={() => handleClose(false)}
               disabled={submitting}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               type="submit"
               disabled={submitting || !network || !token || !amount}
             >
-              {submitting ? "Creating..." : "Create Invoice"}
+              {submitting ? t("common.creating") : t("invoices.createInvoice")}
             </Button>
           </DialogFooter>
         </form>

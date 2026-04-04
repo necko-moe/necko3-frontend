@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { formatDistanceToNow, format, isPast } from "date-fns";
+import { useDateLocale } from "@/lib/date-locale";
 import type { WebhookSchema } from "@/types/webhook";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
@@ -47,14 +49,8 @@ const statusConfig: Record<
   Cancelled: { dot: "bg-muted-foreground/50", badge: "secondary" },
 };
 
-const eventTypeLabels: Record<string, string> = {
-  tx_detected: "Transaction Detected",
-  tx_confirmed: "Transaction Confirmed",
-  invoice_paid: "Invoice Paid",
-  invoice_expired: "Invoice Expired",
-};
-
 function CopyField({ value, mono }: { value: string; mono?: boolean }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -82,7 +78,7 @@ function CopyField({ value, mono }: { value: string; mono?: boolean }) {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : "Click to copy"}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : t("common.clickToCopy")}</TooltipContent>
     </Tooltip>
   );
 }
@@ -110,10 +106,11 @@ function InfoRow({
 }
 
 function TimeField({ date, isRetry }: { date: string; isRetry?: boolean }) {
+  const dateLocale = useDateLocale();
   const d = new Date(date);
   const past = isPast(d);
-  const relative = formatDistanceToNow(d, { addSuffix: true });
-  const exact = format(d, "PPpp");
+  const relative = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
+  const exact = format(d, "PPpp", { locale: dateLocale });
 
   return (
     <Tooltip>
@@ -135,6 +132,7 @@ export function WebhookDetail({
   onCancelled,
 }: WebhookDetailProps) {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -155,13 +153,13 @@ export function WebhookDetail({
         { method: "DELETE" },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to cancel webhook");
+        toast.error(res.message ?? t("webhooks.detail.failedToCancel"));
         return;
       }
       setCancelOpen(false);
       onCancelled();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setCancelling(false);
     }
@@ -174,12 +172,12 @@ export function WebhookDetail({
           <ArrowLeft className="size-5" />
         </Button>
         <div className="flex flex-1 items-center justify-center gap-3">
-          <h2 className="font-heading text-xl font-semibold">Webhook</h2>
+          <h2 className="font-heading text-xl font-semibold">{t("webhooks.detail.title")}</h2>
           <Badge variant={cfg.badge} className="gap-1.5">
             <span
               className={cn("inline-block size-1.5 rounded-full", cfg.dot)}
             />
-            {webhook.status}
+            {t("status." + webhook.status)}
           </Badge>
         </div>
         <div className="size-8" />
@@ -194,7 +192,7 @@ export function WebhookDetail({
           onClick={() => navigate(`/invoices?id=${webhook.invoice_id}`)}
         >
           <FileText className="size-3.5" />
-          View Invoice
+          {t("webhooks.detail.viewInvoice")}
         </Button>
         {canCancel && (
           <Button
@@ -203,7 +201,7 @@ export function WebhookDetail({
             onClick={() => setCancelOpen(true)}
           >
             <XCircle className="size-3.5" />
-            Cancel Webhook
+            {t("webhooks.detail.cancelWebhook")}
           </Button>
         )}
       </div>
@@ -211,23 +209,23 @@ export function WebhookDetail({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardContent className="space-y-1 pt-4">
-            <InfoRow icon={Hash} label="Webhook ID">
+            <InfoRow icon={Hash} label={t("webhooks.detail.webhookId")}>
               <CopyField value={webhook.id} mono />
             </InfoRow>
 
-            <InfoRow icon={FileText} label="Invoice ID">
+            <InfoRow icon={FileText} label={t("webhooks.detail.invoiceId")}>
               <CopyField value={webhook.invoice_id} mono />
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={Link2} label="URL">
+            <InfoRow icon={Link2} label={t("webhooks.detail.url")}>
               <CopyField value={webhook.url} />
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={RotateCcw} label="Attempts">
+            <InfoRow icon={RotateCcw} label={t("webhooks.detail.attempts")}>
               <span className="tabular-nums">
                 {webhook.attempts}{" "}
                 <span className="text-muted-foreground">
@@ -247,14 +245,14 @@ export function WebhookDetail({
             </InfoRow>
 
             {isRetrying && (
-              <InfoRow icon={Timer} label="Next Retry">
+              <InfoRow icon={Timer} label={t("webhooks.detail.nextRetry")}>
                 <TimeField date={webhook.next_retry} isRetry />
               </InfoRow>
             )}
 
             <Separator />
 
-            <InfoRow icon={Clock} label="Created">
+            <InfoRow icon={Clock} label={t("webhooks.detail.created")}>
               <TimeField date={webhook.created_at} />
             </InfoRow>
           </CardContent>
@@ -264,11 +262,11 @@ export function WebhookDetail({
           <CardContent className="space-y-3 pt-4">
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-medium text-muted-foreground">
-                Event Payload
+                {t("webhooks.detail.eventPayload")}
               </h3>
               <Badge variant="secondary" className="text-xs font-normal">
                 <Zap className="mr-1 size-3" />
-                {eventTypeLabels[webhook.payload.event_type] ??
+                {t("webhooks.eventFull." + webhook.payload.event_type) ??
                   webhook.payload.event_type}
               </Badge>
             </div>
@@ -285,8 +283,8 @@ export function WebhookDetail({
       <ConfirmDeleteDialog
         open={cancelOpen}
         onOpenChange={setCancelOpen}
-        title="Cancel this webhook?"
-        description="This will permanently cancel the webhook delivery. No further retry attempts will be made. This action cannot be undone."
+        title={t("webhooks.detail.cancelTitle")}
+        description={t("webhooks.detail.cancelDesc")}
         onConfirm={handleCancel}
         loading={cancelling}
       />

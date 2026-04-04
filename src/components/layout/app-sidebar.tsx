@@ -11,7 +11,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Menu,
+  Check,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -21,6 +23,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Sheet,
   SheetContent,
   SheetTitle,
@@ -29,13 +37,21 @@ import { useAuth } from "@/context/auth-context";
 import { useTheme } from "@/hooks/use-theme";
 import { useSidebar } from "@/context/sidebar-context";
 import { VisuallyHidden } from "radix-ui";
+import { supportedLngs, type SupportedLng } from "@/i18n";
+
+const langFlags: Record<SupportedLng, string> = {
+  en: "🇬🇧",
+  ru: "🇷🇺",
+  uk: "🇺🇦",
+  zh: "🇨🇳",
+};
 
 const navItems = [
-  { to: "/getting-started", label: "Getting Started", icon: Rocket },
-  { to: "/chains", label: "Chains", icon: Link2 },
-  { to: "/invoices", label: "Invoices", icon: FileText },
-  { to: "/payments", label: "Payments", icon: CreditCard },
-  { to: "/webhooks", label: "Webhooks", icon: Webhook },
+  { to: "/getting-started", labelKey: "nav.gettingStarted", icon: Rocket },
+  { to: "/chains", labelKey: "nav.chains", icon: Link2 },
+  { to: "/invoices", labelKey: "nav.invoices", icon: FileText },
+  { to: "/payments", labelKey: "nav.payments", icon: CreditCard },
+  { to: "/webhooks", labelKey: "nav.webhooks", icon: Webhook },
 ] as const;
 
 /** Matches footer icon buttons in collapsed sidebar */
@@ -54,6 +70,11 @@ function SidebarContent({
   const { clearApiKey } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { toggle } = useSidebar();
+  const { t, i18n } = useTranslation();
+
+  function setLang(lng: SupportedLng) {
+    i18n.changeLanguage(lng);
+  }
 
   return (
     <>
@@ -79,7 +100,7 @@ function SidebarContent({
             size="icon"
             className={sidebarCollapsedIconBtn}
             onClick={toggle}
-            aria-label="Collapse sidebar"
+            aria-label={t("sidebar.collapseSidebar")}
           >
             <PanelLeftClose className="size-4" />
           </Button>
@@ -94,7 +115,9 @@ function SidebarContent({
           collapsed ? "items-center px-0" : "px-3",
         )}
       >
-        {navItems.map(({ to, label, icon: Icon }) => {
+        {navItems.map(({ to, labelKey, icon: Icon }) => {
+          const label = t(labelKey);
+
           if (collapsed) {
             return (
               <Tooltip key={to}>
@@ -154,6 +177,38 @@ function SidebarContent({
       >
         {collapsed ? (
           <>
+            <DropdownMenu>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={sidebarCollapsedIconBtn}
+                      aria-label={t("sidebar.language")}
+                    >
+                      <span className="text-base leading-none">{langFlags[i18n.language as SupportedLng]}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {t("languages." + i18n.language)}
+                </TooltipContent>
+              </Tooltip>
+              <DropdownMenuContent side="right" align="end">
+                {supportedLngs.map((lng) => (
+                  <DropdownMenuItem
+                    key={lng}
+                    onClick={() => setLang(lng)}
+                    className="gap-2"
+                  >
+                    <span className="text-base leading-none">{langFlags[lng]}</span>
+                    <span>{t("languages." + lng)}</span>
+                    {i18n.language === lng && <Check className="ml-auto size-4 text-primary" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -161,12 +216,12 @@ function SidebarContent({
                   size="icon"
                   className={sidebarCollapsedIconBtn}
                   onClick={toggleTheme}
-                  aria-label="Toggle theme"
+                  aria-label={t("sidebar.toggleTheme")}
                 >
                   {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">Toggle theme</TooltipContent>
+              <TooltipContent side="right">{t("sidebar.toggleTheme")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -175,12 +230,12 @@ function SidebarContent({
                   size="icon"
                   className={sidebarCollapsedIconBtn}
                   onClick={clearApiKey}
-                  aria-label="Sign out"
+                  aria-label={t("sidebar.signOut")}
                 >
                   <LogOut className="size-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">Sign out</TooltipContent>
+              <TooltipContent side="right">{t("sidebar.signOut")}</TooltipContent>
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -189,22 +244,47 @@ function SidebarContent({
                   size="icon"
                   className={sidebarCollapsedIconBtn}
                   onClick={toggle}
-                  aria-label="Expand sidebar"
+                  aria-label={t("sidebar.expandSidebar")}
                 >
                   <PanelLeftOpen className="size-4" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">Expand sidebar</TooltipContent>
+              <TooltipContent side="right">{t("sidebar.expandSidebar")}</TooltipContent>
             </Tooltip>
           </>
         ) : (
           <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={sidebarCollapsedIconBtn}
+                  aria-label={t("sidebar.language")}
+                >
+                  <span className="text-base leading-none">{langFlags[i18n.language as SupportedLng]}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start">
+                {supportedLngs.map((lng) => (
+                  <DropdownMenuItem
+                    key={lng}
+                    onClick={() => setLang(lng)}
+                    className="gap-2"
+                  >
+                    <span className="text-base leading-none">{langFlags[lng]}</span>
+                    <span>{t("languages." + lng)}</span>
+                    {i18n.language === lng && <Check className="ml-auto size-4 text-primary" />}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button
               variant="ghost"
               size="icon"
               className={sidebarCollapsedIconBtn}
               onClick={toggleTheme}
-              aria-label="Toggle theme"
+              aria-label={t("sidebar.toggleTheme")}
             >
               {theme === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
             </Button>
@@ -214,7 +294,7 @@ function SidebarContent({
               onClick={clearApiKey}
             >
               <LogOut className="size-4" />
-              <span className="whitespace-nowrap overflow-hidden">Sign out</span>
+              <span className="whitespace-nowrap overflow-hidden">{t("sidebar.signOut")}</span>
             </Button>
           </>
         )}
@@ -240,6 +320,7 @@ export function DesktopSidebar() {
 
 export function MobileHeader() {
   const { setMobileOpen } = useSidebar();
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-sidebar-border bg-sidebar px-4 md:hidden">
@@ -247,7 +328,7 @@ export function MobileHeader() {
         variant="ghost"
         size="icon"
         onClick={() => setMobileOpen(true)}
-        aria-label="Open menu"
+        aria-label={t("sidebar.openMenu")}
       >
         <Menu className="size-5" />
       </Button>
@@ -263,6 +344,7 @@ export function MobileHeader() {
 
 export function MobileDrawer() {
   const { mobileOpen, setMobileOpen } = useSidebar();
+  const { t } = useTranslation();
 
   return (
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
@@ -272,7 +354,7 @@ export function MobileDrawer() {
         className="w-64 gap-0 p-0 bg-sidebar text-sidebar-foreground"
       >
         <VisuallyHidden.Root>
-          <SheetTitle>Navigation</SheetTitle>
+          <SheetTitle>{t("sidebar.navigation")}</SheetTitle>
         </VisuallyHidden.Root>
         <SidebarContent
           collapsed={false}

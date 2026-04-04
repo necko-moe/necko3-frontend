@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { TokenConfigSchema } from "@/types/chain";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ interface TokenListProps {
 }
 
 function CopyCell({ value }: { value: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -49,7 +51,7 @@ function CopyCell({ value }: { value: string }) {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : "Click to copy"}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : t("common.clickToCopy")}</TooltipContent>
     </Tooltip>
   );
 }
@@ -60,6 +62,7 @@ export function TokenList({
   onDeleteToken,
   deletingToken,
 }: TokenListProps) {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -67,9 +70,9 @@ export function TokenList({
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     const list = tokens.filter(
-      (t) =>
-        t.symbol.toLowerCase().includes(q) ||
-        t.contract.toLowerCase().includes(q),
+      (tk) =>
+        tk.symbol.toLowerCase().includes(q) ||
+        tk.contract.toLowerCase().includes(q),
     );
     list.sort((a, b) =>
       sortAsc
@@ -83,7 +86,7 @@ export function TokenList({
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Input
-          placeholder="Search tokens..."
+          placeholder={t("chains.tokenList.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1"
@@ -97,13 +100,13 @@ export function TokenList({
         </Button>
         <Button variant="default" size="sm" onClick={onAddToken}>
           <Plus className="size-4" />
-          Add Token
+          {t("chains.tokenList.addToken")}
         </Button>
       </div>
 
       {filtered.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
-          {tokens.length === 0 ? "No tokens configured yet." : "No tokens match your search."}
+          {tokens.length === 0 ? t("chains.tokenList.emptyState") : t("chains.tokenList.noResults")}
         </p>
       ) : (
         <div className="space-y-1">
@@ -147,7 +150,7 @@ export function TokenList({
                     <Trash2 className="size-3.5" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Delete token</TooltipContent>
+                <TooltipContent>{t("chains.tokenList.deleteToken")}</TooltipContent>
               </Tooltip>
             </div>
           ))}
@@ -157,8 +160,8 @@ export function TokenList({
       <ConfirmDeleteDialog
         open={deleteTarget !== null}
         onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
-        title={`Delete token ${deleteTarget}?`}
-        description={`This will permanently remove the token "${deleteTarget}" from this chain. This action cannot be undone.`}
+        title={t("chains.tokenList.deleteTitle", { symbol: deleteTarget })}
+        description={t("chains.tokenList.deleteDesc", { symbol: deleteTarget })}
         loading={deletingToken === deleteTarget}
         onConfirm={() => {
           const symbol = deleteTarget;

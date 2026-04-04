@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,8 @@ export function ConfirmDeleteDialog({
   onConfirm,
   loading,
 }: ConfirmDeleteDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
@@ -38,14 +41,14 @@ export function ConfirmDeleteDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            Cancel
+            {t("common.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={loading}
           >
-            {loading ? "Deleting..." : "Delete"}
+            {loading ? t("common.deleting") : t("common.delete")}
           </Button>
         </DialogFooter>
       </DialogContent>

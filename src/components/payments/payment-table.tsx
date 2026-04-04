@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
+import { useDateLocale } from "@/lib/date-locale";
 import type { PaymentSchema } from "@/types/payment";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +37,7 @@ const statusConfig: Record<
 };
 
 function CopyButton({ value, label }: { value: string; label: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy(e: React.MouseEvent) {
@@ -60,14 +63,15 @@ function CopyButton({ value, label }: { value: string; label: string }) {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : label}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : label}</TooltipContent>
     </Tooltip>
   );
 }
 
 function RelativeTime({ date }: { date: string }) {
+  const dateLocale = useDateLocale();
   const d = new Date(date);
-  const text = formatDistanceToNow(d, { addSuffix: true });
+  const text = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
 
   return (
     <Tooltip>
@@ -101,21 +105,22 @@ function TruncatedMono({
 }
 
 export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[110px]">Status</TableHead>
-          <TableHead>ID</TableHead>
-          <TableHead>Invoice</TableHead>
-          <TableHead>From / To</TableHead>
-          <TableHead>Token</TableHead>
-          <TableHead>Network</TableHead>
-          <TableHead>Tx Hash</TableHead>
-          <TableHead>Block</TableHead>
-          <TableHead>Created</TableHead>
+          <TableHead className="w-[110px]">{t("payments.table.status")}</TableHead>
+          <TableHead>{t("payments.table.id")}</TableHead>
+          <TableHead>{t("payments.table.invoice")}</TableHead>
+          <TableHead>{t("payments.table.fromTo")}</TableHead>
+          <TableHead>{t("payments.table.token")}</TableHead>
+          <TableHead>{t("payments.table.network")}</TableHead>
+          <TableHead>{t("payments.table.txHash")}</TableHead>
+          <TableHead>{t("payments.table.block")}</TableHead>
+          <TableHead>{t("payments.table.created")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -125,7 +130,7 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
               colSpan={9}
               className="py-16 text-center text-sm text-muted-foreground"
             >
-              No payments found.
+              {t("payments.noPaymentsFound")}
             </TableCell>
           </TableRow>
         ) : (
@@ -146,7 +151,7 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
                         cfg.dot,
                       )}
                     />
-                    {p.status}
+                    {t("status." + p.status)}
                   </Badge>
                 </TableCell>
 
@@ -173,7 +178,7 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
                           <FileText className="size-3" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Open invoice</TooltipContent>
+                      <TooltipContent>{t("payments.table.openInvoice")}</TooltipContent>
                     </Tooltip>
                   </div>
                 </TableCell>
@@ -184,13 +189,13 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
                       <span className="font-mono text-xs text-muted-foreground">
                         {p.from.slice(0, 6)}...{p.from.slice(-4)}
                       </span>
-                      <CopyButton value={p.from} label="Copy from address" />
+                      <CopyButton value={p.from} label={t("payments.table.copyFromAddress")} />
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="font-mono text-xs text-muted-foreground">
                         {p.to.slice(0, 6)}...{p.to.slice(-4)}
                       </span>
-                      <CopyButton value={p.to} label="Copy to address" />
+                      <CopyButton value={p.to} label={t("payments.table.copyToAddress")} />
                     </div>
                   </div>
                 </TableCell>
@@ -205,7 +210,7 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
                     onClick={(e) => e.stopPropagation()}
                   >
                     <TruncatedMono value={p.tx_hash} len={10} />
-                    <CopyButton value={p.tx_hash} label="Copy tx hash" />
+                    <CopyButton value={p.tx_hash} label={t("payments.table.copyTxHash")} />
                   </div>
                 </TableCell>
 

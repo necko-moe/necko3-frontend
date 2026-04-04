@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ChainConfigSchema, PartialChainUpdateSchema } from "@/types/chain";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -63,6 +64,7 @@ function FieldRow({
 }
 
 export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps) {
+  const { t } = useTranslation();
   const [newRpc, setNewRpc] = useState("");
 
   const rpcUrls = draft.rpc_urls ?? chain.rpc_urls;
@@ -94,20 +96,20 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
   return (
     <div className="space-y-5">
       {/* Read-only fields */}
-      <FieldRow icon={Cpu} label="Chain Type" tooltip="The blockchain virtual machine type (e.g. EVM). Cannot be changed after creation.">
+      <FieldRow icon={Cpu} label={t("chains.fields.chainType")} tooltip={t("chains.fields.chainTypeTooltip")}>
         <Badge variant="secondary">{chain.chain_type}</Badge>
       </FieldRow>
 
-      <FieldRow icon={Coins} label="Native Symbol" tooltip="The native coin ticker of this chain (e.g. ETH, POL). Set at creation time.">
+      <FieldRow icon={Coins} label={t("chains.fields.nativeSymbol")} tooltip={t("chains.fields.nativeSymbolTooltip")}>
         <p className="text-sm font-medium">{chain.native_symbol}</p>
       </FieldRow>
 
-      <FieldRow icon={Hash} label="Decimals" tooltip="Number of decimal places for the native coin. Set at creation time.">
+      <FieldRow icon={Hash} label={t("chains.fields.decimals")} tooltip={t("chains.fields.decimalsTooltip")}>
         <p className="text-sm font-medium">{chain.decimals}</p>
       </FieldRow>
 
       {/* Editable fields */}
-      <FieldRow icon={Key} label="xpub" tooltip="Extended public key used to derive unique deposit addresses for each invoice.">
+      <FieldRow icon={Key} label={t("chains.fields.xpub")} tooltip={t("chains.fields.xpubTooltip")}>
         <Input
           value={xpub}
           onChange={(e) => onChange({ ...draft, xpub: e.target.value })}
@@ -116,7 +118,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
         />
       </FieldRow>
 
-      <FieldRow icon={Globe} label="RPC URLs" tooltip="List of RPC node endpoints used to interact with this blockchain. At least one is required.">
+      <FieldRow icon={Globe} label={t("chains.fields.rpcUrls")} tooltip={t("chains.fields.rpcUrlsTooltip")}>
         <div className="space-y-2">
           {rpcUrls.map((url, i) => (
             <div key={i} className="flex items-center gap-1.5">
@@ -148,7 +150,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
                 }
               }}
               className="font-mono text-xs"
-              placeholder="Add new RPC URL..."
+              placeholder={t("chains.fields.addNewRpcUrl")}
             />
             <Button
               type="button"
@@ -163,7 +165,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
         </div>
       </FieldRow>
 
-      <FieldRow icon={Layers} label="Block Lag" tooltip="Number of blocks behind the chain head to start scanning. Helps avoid reorgs.">
+      <FieldRow icon={Layers} label={t("chains.fields.blockLag")} tooltip={t("chains.fields.blockLagTooltip")}>
         <Input
           type="number"
           min={0}
@@ -172,7 +174,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
         />
       </FieldRow>
 
-      <FieldRow icon={ShieldCheck} label="Required Confirmations" tooltip="Number of block confirmations needed before a payment is considered confirmed.">
+      <FieldRow icon={ShieldCheck} label={t("chains.fields.requiredConfirmations")} tooltip={t("chains.fields.requiredConfirmationsTooltip")}>
         <Input
           type="number"
           min={0}
@@ -181,7 +183,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
         />
       </FieldRow>
 
-      <FieldRow icon={ChevronsUp} label="Last Processed Block" tooltip="The last block number processed by the scanner. Set to 0 to start from the latest block in the blockchain.">
+      <FieldRow icon={ChevronsUp} label={t("chains.fields.lastProcessedBlock")} tooltip={t("chains.fields.lastProcessedBlockTooltip")}>
         <Input
           type="number"
           min={0}
@@ -190,7 +192,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
         />
       </FieldRow>
 
-      <FieldRow icon={Image} label="Logo URL" tooltip="URL to the chain's logo image. Displayed in the admin panel.">
+      <FieldRow icon={Image} label={t("chains.fields.logoUrl")} tooltip={t("chains.fields.logoUrlTooltip")}>
         <Input
           value={logoUrl}
           onChange={(e) => onChange({ ...draft, logo_url: e.target.value || null })}

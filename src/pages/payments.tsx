@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ChainConfigSchema } from "@/types/chain";
 import type { PaymentSchema, PaymentStatus } from "@/types/payment";
@@ -35,6 +36,7 @@ const STATUSES: PaymentStatus[] = ["Confirming", "Confirmed", "Cancelled"];
 
 export function PaymentsPage() {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Number(searchParams.get("page") ?? "1");
@@ -171,7 +173,7 @@ export function PaymentsPage() {
         apiKey,
       );
       if (res.status === "error") {
-        const msg = res.message ?? "Could not load payment";
+        const msg = res.message ?? t("payments.failedToLoad");
         if (everLoaded.current) {
           toast.error(msg);
         } else {
@@ -186,14 +188,14 @@ export function PaymentsPage() {
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      const msg = err instanceof Error ? err.message : "Unexpected error";
+      const msg = err instanceof Error ? err.message : t("common.unexpectedError");
       if (everLoaded.current) {
         toast.error(msg);
       } else {
         setDetailError(msg);
       }
     }
-  }, [apiKey, selectedId]);
+  }, [apiKey, selectedId, t]);
 
   useEffect(() => {
     fetchSinglePayment();
@@ -258,17 +260,17 @@ export function PaymentsPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
         <h1 className="font-heading text-3xl font-bold tracking-tight">
-          Payments
+          {t("payments.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Monitor and manage incoming payments.
+          {t("payments.subtitle")}
         </p>
       </header>
 
       {/* Primary filters */}
       <div className="flex flex-wrap items-center gap-2">
         <Input
-          placeholder="Invoice ID..."
+          placeholder={t("payments.invoiceId")}
           value={invoiceIdFilter}
           onChange={(e) => setParam("invoice_id", e.target.value)}
           className="w-48"
@@ -279,10 +281,10 @@ export function PaymentsPage() {
           onValueChange={(v) => setParam("network", v === "__all__" ? "" : v)}
         >
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="All Networks" />
+            <SelectValue placeholder={t("common.allNetworks")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Networks</SelectItem>
+            <SelectItem value="__all__">{t("common.allNetworks")}</SelectItem>
             {chainNames.map((name) => (
               <SelectItem key={name} value={name}>
                 {name}
@@ -292,7 +294,7 @@ export function PaymentsPage() {
         </Select>
 
         <Input
-          placeholder="Token..."
+          placeholder={t("payments.token")}
           value={tokenFilter}
           onChange={(e) => setParam("token", e.target.value)}
           className="w-32"
@@ -303,13 +305,13 @@ export function PaymentsPage() {
           onValueChange={(v) => setParam("status", v === "__all__" ? "" : v)}
         >
           <SelectTrigger className="w-36">
-            <SelectValue placeholder="All Statuses" />
+            <SelectValue placeholder={t("common.allStatuses")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="__all__">All Statuses</SelectItem>
+            <SelectItem value="__all__">{t("common.allStatuses")}</SelectItem>
             {STATUSES.map((s) => (
               <SelectItem key={s} value={s}>
-                {s}
+                {t("status." + s)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -322,7 +324,7 @@ export function PaymentsPage() {
           className="gap-1.5"
         >
           <SlidersHorizontal className="size-3.5" />
-          Advanced
+          {t("payments.advanced")}
           {advancedFilterCount > 0 && !showAdvanced && (
             <Badge variant="secondary" className="ml-1 size-5 justify-center rounded-full p-0 text-[10px]">
               {advancedFilterCount}
@@ -338,7 +340,7 @@ export function PaymentsPage() {
         {hasFilters && (
           <Button variant="ghost" size="sm" onClick={clearFilters}>
             <RotateCcw className="size-3.5" />
-            Clear
+            {t("common.clear")}
           </Button>
         )}
       </div>
@@ -347,19 +349,19 @@ export function PaymentsPage() {
       {showAdvanced && (
         <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border/50 bg-muted/30 px-3 py-2.5">
           <Input
-            placeholder="From address..."
+            placeholder={t("payments.fromAddress")}
             value={fromFilter}
             onChange={(e) => setParam("from", e.target.value)}
             className="w-48"
           />
           <Input
-            placeholder="To address..."
+            placeholder={t("payments.toAddress")}
             value={toFilter}
             onChange={(e) => setParam("to", e.target.value)}
             className="w-48"
           />
           <Input
-            placeholder="Block number..."
+            placeholder={t("payments.blockNumber")}
             type="number"
             value={blockFilter}
             onChange={(e) => setParam("block_number", e.target.value)}
@@ -381,7 +383,7 @@ export function PaymentsPage() {
       {!loading && total > 0 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            {total} payment{total !== 1 && "s"} total
+            {t("payments.total", { count: total })}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -391,10 +393,10 @@ export function PaymentsPage() {
               onClick={() => setParam("page", String(page - 1))}
             >
               <ChevronLeft className="size-4" />
-              Previous
+              {t("common.previous")}
             </Button>
             <span className="text-sm text-muted-foreground">
-              Page {page} of {totalPages}
+              {t("common.pageOf", { page, totalPages })}
             </span>
             <Button
               variant="outline"
@@ -402,7 +404,7 @@ export function PaymentsPage() {
               disabled={page >= totalPages}
               onClick={() => setParam("page", String(page + 1))}
             >
-              Next
+              {t("common.next")}
               <ChevronRight className="size-4" />
             </Button>
           </div>

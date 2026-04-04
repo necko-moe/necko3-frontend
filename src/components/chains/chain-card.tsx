@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ChainConfigSchema } from "@/types/chain";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,8 @@ interface ChainCardProps {
 }
 
 export function ChainCard({ chain, onClick }: ChainCardProps) {
+  const { t } = useTranslation();
+
   return (
     <button
       type="button"
@@ -32,7 +35,7 @@ export function ChainCard({ chain, onClick }: ChainCardProps) {
       <span className="text-sm font-medium">{chain.name}</span>
 
       <Badge variant={chain.active ? "secondary" : "outline"}>
-        {chain.active ? "Active" : "Inactive"}
+        {chain.active ? t("common.active") : t("common.inactive")}
       </Badge>
     </button>
   );

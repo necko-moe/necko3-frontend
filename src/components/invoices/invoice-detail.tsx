@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { formatDistanceToNow, format, isPast } from "date-fns";
+import { useDateLocale } from "@/lib/date-locale";
 import type { InvoiceSchema } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
@@ -54,6 +56,7 @@ const statusConfig: Record<
 };
 
 function CopyField({ value, mono }: { value: string; mono?: boolean }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -81,7 +84,7 @@ function CopyField({ value, mono }: { value: string; mono?: boolean }) {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : "Click to copy"}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : t("common.clickToCopy")}</TooltipContent>
     </Tooltip>
   );
 }
@@ -109,10 +112,11 @@ function InfoRow({
 }
 
 function TimeField({ date, isExpiry }: { date: string; isExpiry?: boolean }) {
+  const dateLocale = useDateLocale();
   const d = new Date(date);
   const past = isPast(d);
-  const relative = formatDistanceToNow(d, { addSuffix: true });
-  const exact = format(d, "PPpp");
+  const relative = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
+  const exact = format(d, "PPpp", { locale: dateLocale });
 
   return (
     <Tooltip>
@@ -136,6 +140,7 @@ export function InvoiceDetail({
   onBack,
   onCancelled,
 }: InvoiceDetailProps) {
+  const { t } = useTranslation();
   const { apiKey } = useAuth();
   const navigate = useNavigate();
 
@@ -157,13 +162,13 @@ export function InvoiceDetail({
         { method: "DELETE" },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to cancel invoice");
+        toast.error(res.message ?? t("invoices.detail.failedToCancel"));
         return;
       }
       setCancelOpen(false);
       onCancelled();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setCancelling(false);
     }
@@ -183,12 +188,12 @@ export function InvoiceDetail({
           <ArrowLeft className="size-5" />
         </Button>
         <div className="flex flex-1 items-center justify-center gap-3">
-          <h2 className="font-heading text-xl font-semibold">Invoice</h2>
+          <h2 className="font-heading text-xl font-semibold">{t("invoices.detail.title")}</h2>
           <Badge variant={cfg.badge} className="gap-1.5">
             <span
               className={cn("inline-block size-1.5 rounded-full", cfg.dot)}
             />
-            {invoice.status}
+            {t("status." + invoice.status)}
           </Badge>
         </div>
         <div className="size-8" />
@@ -204,7 +209,7 @@ export function InvoiceDetail({
           ) : (
             <Link2 className="size-3.5" />
           )}
-          {linkCopied ? "Copied!" : "Copy Payment Link"}
+          {linkCopied ? t("common.copied") : t("invoices.detail.copyPaymentLink")}
         </Button>
         <Button
           variant="outline"
@@ -212,7 +217,7 @@ export function InvoiceDetail({
           onClick={() => window.open(paymentLink, "_blank")}
         >
           <ExternalLink className="size-3.5" />
-          Open Payment Page
+          {t("invoices.detail.openPaymentPage")}
         </Button>
         <Button
           variant="outline"
@@ -220,7 +225,7 @@ export function InvoiceDetail({
           onClick={() => navigate(`/payments?invoice_id=${invoice.id}`)}
         >
           <CreditCard className="size-3.5" />
-          Payments
+          {t("invoices.detail.payments")}
         </Button>
         <Button
           variant="outline"
@@ -228,7 +233,7 @@ export function InvoiceDetail({
           onClick={() => navigate(`/webhooks?invoice_id=${invoice.id}`)}
         >
           <Webhook className="size-3.5" />
-          Webhooks
+          {t("invoices.detail.webhooks")}
         </Button>
         {invoice.status === "Pending" && (
           <Button
@@ -237,7 +242,7 @@ export function InvoiceDetail({
             onClick={() => setCancelOpen(true)}
           >
             <XCircle className="size-3.5" />
-            Cancel Invoice
+            {t("invoices.detail.cancelInvoice")}
           </Button>
         )}
       </div>
@@ -247,23 +252,23 @@ export function InvoiceDetail({
         {/* Left: invoice info */}
         <Card>
           <CardContent className="space-y-1 pt-4">
-            <InfoRow icon={Hash} label="Invoice ID">
+            <InfoRow icon={Hash} label={t("invoices.detail.invoiceId")}>
               <CopyField value={invoice.id} mono />
             </InfoRow>
 
-            <InfoRow icon={Wallet} label="Deposit Address">
+            <InfoRow icon={Wallet} label={t("invoices.detail.depositAddress")}>
               <CopyField value={invoice.address} mono />
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={Coins} label="Amount">
+            <InfoRow icon={Coins} label={t("invoices.detail.amount")}>
               <span>
                 {invoice.amount} {invoice.token}
               </span>
             </InfoRow>
 
-            <InfoRow icon={Coins} label="Paid">
+            <InfoRow icon={Coins} label={t("invoices.detail.paid")}>
               <span>
                 {invoice.paid} {invoice.token}
               </span>
@@ -271,25 +276,25 @@ export function InvoiceDetail({
 
             <Separator />
 
-            <InfoRow icon={Globe} label="Network">
+            <InfoRow icon={Globe} label={t("invoices.detail.network")}>
               {invoice.network}
             </InfoRow>
 
-            <InfoRow icon={Hash} label="Decimals">
+            <InfoRow icon={Hash} label={t("invoices.detail.decimals")}>
               {invoice.decimals}
             </InfoRow>
 
-            <InfoRow icon={Hash} label="Address Index">
+            <InfoRow icon={Hash} label={t("invoices.detail.addressIndex")}>
               {invoice.address_index}
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={Clock} label="Created">
+            <InfoRow icon={Clock} label={t("invoices.detail.created")}>
               <TimeField date={invoice.created_at} />
             </InfoRow>
 
-            <InfoRow icon={Clock} label="Expires">
+            <InfoRow icon={Clock} label={t("invoices.detail.expires")}>
               <TimeField date={invoice.expires_at} isExpiry />
             </InfoRow>
           </CardContent>
@@ -301,15 +306,15 @@ export function InvoiceDetail({
             <Card>
               <CardContent className="space-y-1 pt-4">
                 <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                  Webhook Configuration
+                  {t("invoices.detail.webhookConfiguration")}
                 </h3>
 
-                <InfoRow icon={Link2} label="URL">
+                <InfoRow icon={Link2} label={t("invoices.detail.url")}>
                   <CopyField value={invoice.webhook_url} />
                 </InfoRow>
 
                 {invoice.webhook_secret && (
-                  <InfoRow icon={Eye} label="Secret">
+                  <InfoRow icon={Eye} label={t("invoices.detail.secret")}>
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-xs">
                         {secretVisible
@@ -333,7 +338,7 @@ export function InvoiceDetail({
                 )}
 
                 {invoice.webhook_max_retries != null && (
-                  <InfoRow icon={RotateCcw} label="Max Retries">
+                  <InfoRow icon={RotateCcw} label={t("invoices.detail.maxRetries")}>
                     {invoice.webhook_max_retries}
                   </InfoRow>
                 )}
@@ -345,7 +350,7 @@ export function InvoiceDetail({
           <Card>
             <CardContent className="pt-4">
               <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                Raw Values
+                {t("invoices.detail.rawValues")}
               </h3>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
@@ -365,8 +370,8 @@ export function InvoiceDetail({
       <ConfirmDeleteDialog
         open={cancelOpen}
         onOpenChange={setCancelOpen}
-        title="Cancel this invoice?"
-        description="This will permanently cancel the invoice. Any pending payments will no longer be tracked. This action cannot be undone."
+        title={t("invoices.detail.cancelTitle")}
+        description={t("invoices.detail.cancelDesc")}
         onConfirm={handleCancel}
         loading={cancelling}
       />

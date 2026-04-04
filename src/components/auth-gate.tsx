@@ -1,4 +1,5 @@
 import { type FormEvent, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { KeyRound } from "lucide-react";
 import {
   Dialog,
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 
 export function AuthGate({ children }: { children: React.ReactNode }) {
+  const { t } = useTranslation();
   const { apiKey, setApiKey } = useAuth();
   const [draft, setDraft] = useState("");
 
@@ -32,25 +34,24 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
             <KeyRound className="size-6 text-primary" />
           </div>
           <DialogTitle className="text-center">
-            Welcome to necko3
+            {t("auth.welcome")}
           </DialogTitle>
           <DialogDescription className="text-center">
-            Enter your API key to continue. The key is only stored for this
-            browser session.
+            {t("auth.description")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <Input
             autoFocus
-            placeholder="X-API-Key"
+            placeholder={t("auth.placeholder")}
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             className="h-10 font-mono"
           />
           <DialogFooter className="sm:justify-center">
             <Button type="submit" disabled={!draft.trim()} className="w-full sm:w-auto">
-              Continue
+              {t("auth.continue")}
             </Button>
           </DialogFooter>
         </form>

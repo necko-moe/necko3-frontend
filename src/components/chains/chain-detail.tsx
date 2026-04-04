@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type {
   ChainConfigSchema,
@@ -31,6 +32,7 @@ export function ChainDetail({
   onChainUpdated,
 }: ChainDetailProps) {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
 
   const [draft, setDraft] = useState<PartialChainUpdateSchema>({});
   const [tokens, setTokens] = useState<TokenConfigSchema[]>([]);
@@ -53,16 +55,16 @@ export function ChainDetail({
         apiKey,
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to load tokens");
+        toast.error(res.message ?? t("chains.failedToLoadTokens"));
       } else if (res.data) {
         setTokens(res.data);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setTokensLoading(false);
     }
-  }, [apiKey, chain.name]);
+  }, [apiKey, chain.name, t]);
 
   useEffect(() => {
     fetchTokens();
@@ -87,7 +89,7 @@ export function ChainDetail({
         { method: "PATCH", body: JSON.stringify(draft) },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to save changes");
+        toast.error(res.message ?? t("chains.failedToSave"));
         return;
       }
       const merged: ChainConfigSchema = {
@@ -103,7 +105,7 @@ export function ChainDetail({
       onChainUpdated(merged);
       setDraft({});
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setSaving(false);
     }
@@ -123,13 +125,13 @@ export function ChainDetail({
         { method: "DELETE" },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to delete chain");
+        toast.error(res.message ?? t("chains.failedToDelete"));
         return;
       }
       setDeleteOpen(false);
       onChainDeleted();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setDeleting(false);
     }
@@ -145,13 +147,13 @@ export function ChainDetail({
         { method: "POST", body: JSON.stringify(token) },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to add token");
+        toast.error(res.message ?? t("chains.failedToAddToken"));
         return;
       }
       setAddTokenOpen(false);
       fetchTokens();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setAddingToken(false);
     }
@@ -167,13 +169,13 @@ export function ChainDetail({
         { method: "DELETE" },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to delete token");
+        toast.error(res.message ?? t("chains.failedToDeleteToken"));
         return false;
       }
-      setTokens((prev) => prev.filter((t) => t.symbol !== symbol));
+      setTokens((prev) => prev.filter((tk) => tk.symbol !== symbol));
       return true;
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
       return false;
     } finally {
       setDeletingToken(null);
@@ -221,7 +223,7 @@ export function ChainDetail({
                 onCheckedChange={handleActiveToggle}
               />
               <Label className="text-sm">
-                {activeValue ? "Active" : "Inactive"}
+                {activeValue ? t("common.active") : t("common.inactive")}
               </Label>
             </div>
             <Button
@@ -230,7 +232,7 @@ export function ChainDetail({
               onClick={() => setDeleteOpen(true)}
             >
               <Trash2 className="size-3.5" />
-              Delete Chain
+              {t("chains.deleteChain")}
             </Button>
           </div>
 
@@ -242,20 +244,20 @@ export function ChainDetail({
 
           <div className="flex items-center gap-3">
             <Button onClick={handleSave} disabled={!isDirty || saving}>
-              {saving ? "Saving..." : "Save changes"}
+              {saving ? t("common.saving") : t("common.saveChanges")}
             </Button>
             <Button variant="outline" onClick={handleRevert} disabled={!isDirty}>
-              Revert
+              {t("common.revert")}
             </Button>
           </div>
         </div>
 
         {/* Right panel -- tokens */}
         <div className="min-w-0">
-          <h3 className="mb-4 font-heading text-base font-medium">Tokens</h3>
+          <h3 className="mb-4 font-heading text-base font-medium">{t("chains.tokens")}</h3>
           {tokensLoading ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
-              Loading tokens...
+              {t("chains.loadingTokens")}
             </p>
           ) : (
             <TokenList
@@ -272,8 +274,8 @@ export function ChainDetail({
       <ConfirmDeleteDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title={`Delete chain "${chain.name}"?`}
-        description="This will permanently remove this chain and all its tokens. This action cannot be undone."
+        title={t("chains.deleteChainTitle", { name: chain.name })}
+        description={t("chains.deleteChainDesc")}
         onConfirm={handleDeleteChain}
         loading={deleting}
       />

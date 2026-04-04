@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ChainConfigSchema } from "@/types/chain";
 import { useAuth } from "@/context/auth-context";
@@ -13,6 +14,7 @@ import { AddChainDialog } from "@/components/chains/add-chain-dialog";
 
 export function ChainsPage() {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
 
   const [chains, setChains] = useState<ChainConfigSchema[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ export function ChainsPage() {
     try {
       const res = await apiFetch<ChainConfigSchema[]>("/chain", apiKey);
       if (res.status === "error") {
-        const msg = res.message ?? "Could not load chains";
+        const msg = res.message ?? t("chains.failedToLoad");
         if (everLoaded.current) {
           toast.error(msg);
         } else {
@@ -43,7 +45,7 @@ export function ChainsPage() {
       }
     } catch (err) {
       if (err instanceof Error && err.name === "AbortError") return;
-      const msg = err instanceof Error ? err.message : "Unexpected error";
+      const msg = err instanceof Error ? err.message : t("common.unexpectedError");
       if (everLoaded.current) {
         toast.error(msg);
       } else {
@@ -52,7 +54,7 @@ export function ChainsPage() {
     } finally {
       setLoading(false);
     }
-  }, [apiKey]);
+  }, [apiKey, t]);
 
   useEffect(() => {
     fetchChains();
@@ -83,13 +85,13 @@ export function ChainsPage() {
         body: JSON.stringify(chain),
       });
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to add chain");
+        toast.error(res.message ?? t("chains.failedToAdd"));
         return;
       }
       setAddOpen(false);
       fetchChains();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setAdding(false);
     }
@@ -124,10 +126,10 @@ export function ChainsPage() {
       <div className="mx-auto max-w-5xl space-y-6">
         <header>
           <h1 className="font-heading text-3xl font-bold tracking-tight">
-            Chains
+            {t("chains.title")}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage blockchain networks and their tokens.
+            {t("chains.subtitle")}
           </p>
         </header>
         <ErrorBlock message={error} onRetry={fetchChains} />
@@ -139,16 +141,16 @@ export function ChainsPage() {
     <div className="mx-auto max-w-5xl space-y-6">
       <header>
         <h1 className="font-heading text-3xl font-bold tracking-tight">
-          Chains
+          {t("chains.title")}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Manage blockchain networks and their tokens.
+          {t("chains.subtitle")}
         </p>
       </header>
 
       <div className="flex items-center gap-2">
         <Input
-          placeholder="Search chains..."
+          placeholder={t("chains.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-xs"
@@ -163,7 +165,7 @@ export function ChainsPage() {
         <div className="flex-1" />
         <Button onClick={() => setAddOpen(true)}>
           <Plus className="size-4" />
-          Add Chain
+          {t("chains.addChain")}
         </Button>
       </div>
 
@@ -174,8 +176,8 @@ export function ChainsPage() {
       ) : filtered.length === 0 ? (
         <p className="py-20 text-center text-sm text-muted-foreground">
           {chains.length === 0
-            ? "No chains configured yet. Add your first chain to get started."
-            : "No chains match your search."}
+            ? t("chains.emptyState")
+            : t("chains.noResults")}
         </p>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">

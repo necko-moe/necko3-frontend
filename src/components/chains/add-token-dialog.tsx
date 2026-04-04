@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { TokenConfigSchema } from "@/types/chain";
 import {
   Dialog,
@@ -34,6 +35,7 @@ export function AddTokenDialog({
   onSubmit,
   loading,
 }: AddTokenDialogProps) {
+  const { t } = useTranslation();
   const [form, setForm] = useState<TokenConfigSchema>({ ...EMPTY });
 
   function reset() {
@@ -57,16 +59,16 @@ export function AddTokenDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Add Token to {chainName}</DialogTitle>
+          <DialogTitle>{t("chains.addTokenDialog.title", { name: chainName })}</DialogTitle>
           <DialogDescription>
-            Add an ERC-20 token to track on this chain.
+            {t("chains.addTokenDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Symbol *</Label>
+              <Label>{t("chains.addTokenDialog.symbol")}</Label>
               <Input
                 required
                 value={form.symbol}
@@ -75,7 +77,7 @@ export function AddTokenDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Decimals *</Label>
+              <Label>{t("chains.addTokenDialog.decimals")}</Label>
               <Input
                 required
                 type="number"
@@ -87,7 +89,7 @@ export function AddTokenDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Contract Address *</Label>
+            <Label>{t("chains.addTokenDialog.contractAddress")}</Label>
             <Input
               required
               value={form.contract}
@@ -98,7 +100,7 @@ export function AddTokenDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Logo URL</Label>
+            <Label>{t("chains.addTokenDialog.logoUrl")}</Label>
             <Input
               value={form.logo_url ?? ""}
               onChange={(e) => setForm({ ...form, logo_url: e.target.value || null })}
@@ -108,10 +110,10 @@ export function AddTokenDialog({
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleClose(false)} disabled={loading}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Token"}
+              {loading ? t("common.adding") : t("chains.addTokenDialog.addToken")}
             </Button>
           </DialogFooter>
         </form>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { formatDistanceToNow, isPast } from "date-fns";
+import { useDateLocale } from "@/lib/date-locale";
 import type { InvoiceSchema } from "@/types/invoice";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +46,7 @@ const statusConfig: Record<
 };
 
 function CopyButton({ value, label }: { value: string; label: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy(e: React.MouseEvent) {
@@ -69,15 +72,16 @@ function CopyButton({ value, label }: { value: string; label: string }) {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : label}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : label}</TooltipContent>
     </Tooltip>
   );
 }
 
 function RelativeTime({ date, expired }: { date: string; expired?: boolean }) {
+  const dateLocale = useDateLocale();
   const d = new Date(date);
   const past = isPast(d);
-  const text = formatDistanceToNow(d, { addSuffix: true });
+  const text = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
 
   return (
     <Tooltip>
@@ -99,20 +103,21 @@ function RelativeTime({ date, expired }: { date: string; expired?: boolean }) {
 }
 
 export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Status</TableHead>
-          <TableHead>ID</TableHead>
-          <TableHead>Amount</TableHead>
-          <TableHead>Network</TableHead>
-          <TableHead>Paid</TableHead>
-          <TableHead>Created</TableHead>
-          <TableHead>Expires</TableHead>
-          <TableHead className="text-right">Actions</TableHead>
+          <TableHead className="w-[100px]">{t("invoices.table.status")}</TableHead>
+          <TableHead>{t("invoices.table.id")}</TableHead>
+          <TableHead>{t("invoices.table.amount")}</TableHead>
+          <TableHead>{t("invoices.table.network")}</TableHead>
+          <TableHead>{t("invoices.table.paid")}</TableHead>
+          <TableHead>{t("invoices.table.created")}</TableHead>
+          <TableHead>{t("invoices.table.expires")}</TableHead>
+          <TableHead className="text-right">{t("invoices.table.actions")}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -122,7 +127,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
               colSpan={8}
               className="py-16 text-center text-sm text-muted-foreground"
             >
-              No invoices found.
+              {t("invoices.noInvoicesFound")}
             </TableCell>
           </TableRow>
         ) : (
@@ -140,7 +145,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                     <span
                       className={cn("inline-block size-1.5 rounded-full", cfg.dot)}
                     />
-                    {inv.status}
+                    {t("status." + inv.status)}
                   </Badge>
                 </TableCell>
 
@@ -173,7 +178,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                   >
                     <CopyButton
                       value={`${PAYMENT_URL}/${inv.id}`}
-                      label="Copy payment link"
+                      label={t("invoices.table.copyPaymentLink")}
                     />
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -188,7 +193,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                           <CreditCard className="size-3.5" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>View payments</TooltipContent>
+                      <TooltipContent>{t("invoices.table.viewPayments")}</TooltipContent>
                     </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -203,7 +208,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                           <Webhook className="size-3.5" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>View webhooks</TooltipContent>
+                      <TooltipContent>{t("invoices.table.viewWebhooks")}</TooltipContent>
                     </Tooltip>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -221,7 +226,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                           <ExternalLink className="size-3.5" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Open payment page</TooltipContent>
+                      <TooltipContent>{t("invoices.table.openPaymentPage")}</TooltipContent>
                     </Tooltip>
                   </div>
                 </TableCell>

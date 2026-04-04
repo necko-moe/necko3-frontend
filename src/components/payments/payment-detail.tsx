@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { formatDistanceToNow, format } from "date-fns";
+import { useDateLocale } from "@/lib/date-locale";
 import type { PaymentSchema } from "@/types/payment";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
@@ -48,6 +50,7 @@ const statusConfig: Record<
 };
 
 function CopyField({ value, mono }: { value: string; mono?: boolean }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -75,7 +78,7 @@ function CopyField({ value, mono }: { value: string; mono?: boolean }) {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : "Click to copy"}</TooltipContent>
+      <TooltipContent>{copied ? t("common.copied") : t("common.clickToCopy")}</TooltipContent>
     </Tooltip>
   );
 }
@@ -103,9 +106,10 @@ function InfoRow({
 }
 
 function TimeField({ date }: { date: string }) {
+  const dateLocale = useDateLocale();
   const d = new Date(date);
-  const relative = formatDistanceToNow(d, { addSuffix: true });
-  const exact = format(d, "PPpp");
+  const relative = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
+  const exact = format(d, "PPpp", { locale: dateLocale });
 
   return (
     <Tooltip>
@@ -123,6 +127,7 @@ export function PaymentDetail({
   onCancelled,
 }: PaymentDetailProps) {
   const { apiKey } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -140,13 +145,13 @@ export function PaymentDetail({
         { method: "DELETE" },
       );
       if (res.status === "error") {
-        toast.error(res.message ?? "Failed to cancel payment");
+        toast.error(res.message ?? t("payments.detail.failedToCancel"));
         return;
       }
       setCancelOpen(false);
       onCancelled();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Unexpected error");
+      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setCancelling(false);
     }
@@ -159,12 +164,12 @@ export function PaymentDetail({
           <ArrowLeft className="size-5" />
         </Button>
         <div className="flex flex-1 items-center justify-center gap-3">
-          <h2 className="font-heading text-xl font-semibold">Payment</h2>
+          <h2 className="font-heading text-xl font-semibold">{t("payments.detail.title")}</h2>
           <Badge variant={cfg.badge} className="gap-1.5">
             <span
               className={cn("inline-block size-1.5 rounded-full", cfg.dot)}
             />
-            {payment.status}
+            {t("status." + payment.status)}
           </Badge>
         </div>
         <div className="size-8" />
@@ -179,7 +184,7 @@ export function PaymentDetail({
           onClick={() => navigate(`/invoices?id=${payment.invoice_id}`)}
         >
           <FileText className="size-3.5" />
-          View Invoice
+          {t("payments.detail.viewInvoice")}
         </Button>
         {payment.status === "Confirming" && (
           <Button
@@ -188,7 +193,7 @@ export function PaymentDetail({
             onClick={() => setCancelOpen(true)}
           >
             <XCircle className="size-3.5" />
-            Cancel Payment
+            {t("payments.detail.cancelPayment")}
           </Button>
         )}
       </div>
@@ -196,31 +201,31 @@ export function PaymentDetail({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardContent className="space-y-1 pt-4">
-            <InfoRow icon={Hash} label="Payment ID">
+            <InfoRow icon={Hash} label={t("payments.detail.paymentId")}>
               <CopyField value={payment.id} mono />
             </InfoRow>
 
-            <InfoRow icon={FileText} label="Invoice ID">
+            <InfoRow icon={FileText} label={t("payments.detail.invoiceId")}>
               <CopyField value={payment.invoice_id} mono />
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={Wallet} label="From">
+            <InfoRow icon={Wallet} label={t("payments.detail.from")}>
               <CopyField value={payment.from} mono />
             </InfoRow>
 
-            <InfoRow icon={Wallet} label="To">
+            <InfoRow icon={Wallet} label={t("payments.detail.to")}>
               <CopyField value={payment.to} mono />
             </InfoRow>
 
             <Separator />
 
-            <InfoRow icon={Globe} label="Network">
+            <InfoRow icon={Globe} label={t("payments.detail.network")}>
               {payment.network}
             </InfoRow>
 
-            <InfoRow icon={Coins} label="Token">
+            <InfoRow icon={Coins} label={t("payments.detail.token")}>
               {payment.token}
             </InfoRow>
           </CardContent>
@@ -230,24 +235,24 @@ export function PaymentDetail({
           <Card>
             <CardContent className="space-y-1 pt-4">
               <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                Transaction
+                {t("payments.detail.transaction")}
               </h3>
 
-              <InfoRow icon={ArrowRightLeft} label="Tx Hash">
+              <InfoRow icon={ArrowRightLeft} label={t("payments.detail.txHash")}>
                 <CopyField value={payment.tx_hash} mono />
               </InfoRow>
 
-              <InfoRow icon={Layers} label="Block Number">
+              <InfoRow icon={Layers} label={t("payments.detail.blockNumber")}>
                 {payment.block_number.toLocaleString()}
               </InfoRow>
 
-              <InfoRow icon={List} label="Log Index">
+              <InfoRow icon={List} label={t("payments.detail.logIndex")}>
                 {payment.log_index}
               </InfoRow>
 
               <Separator />
 
-              <InfoRow icon={Clock} label="Created">
+              <InfoRow icon={Clock} label={t("payments.detail.created")}>
                 <TimeField date={payment.created_at} />
               </InfoRow>
             </CardContent>
@@ -256,7 +261,7 @@ export function PaymentDetail({
           <Card>
             <CardContent className="pt-4">
               <h3 className="mb-2 text-sm font-medium text-muted-foreground">
-                Raw Values
+                {t("payments.detail.rawValues")}
               </h3>
               <div className="space-y-2 text-xs">
                 <div className="flex justify-between">
@@ -272,8 +277,8 @@ export function PaymentDetail({
       <ConfirmDeleteDialog
         open={cancelOpen}
         onOpenChange={setCancelOpen}
-        title="Cancel this payment?"
-        description="This will permanently cancel the payment. This action cannot be undone."
+        title={t("payments.detail.cancelTitle")}
+        description={t("payments.detail.cancelDesc")}
         onConfirm={handleCancel}
         loading={cancelling}
       />

@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/context/auth-context";
 import { AuthGate } from "@/components/auth-gate";
@@ -12,6 +14,12 @@ import { PaymentsPage } from "@/pages/payments";
 import { WebhooksPage } from "@/pages/webhooks";
 
 export function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
+
   return (
     <ThemeProvider>
     <BrowserRouter>

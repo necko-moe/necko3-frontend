@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ChainConfigSchema, ChainType } from "@/types/chain";
 import {
   Dialog,
@@ -41,6 +42,7 @@ export function AddChainDialog({
   onSubmit,
   loading,
 }: AddChainDialogProps) {
+  const { t } = useTranslation();
   const [form, setForm] = useState<ChainConfigSchema>({ ...EMPTY });
 
   function reset() {
@@ -82,16 +84,16 @@ export function AddChainDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Chain</DialogTitle>
+          <DialogTitle>{t("chains.addDialog.title")}</DialogTitle>
           <DialogDescription>
-            Configure a new blockchain network. All fields marked with * are required.
+            {t("chains.addDialog.description")}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Name *</Label>
+              <Label>{t("chains.addDialog.name")}</Label>
               <Input
                 required
                 value={form.name}
@@ -100,14 +102,14 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Chain Type *</Label>
+              <Label>{t("chains.addDialog.chainType")}</Label>
               <Input value={form.chain_type} disabled />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Native Symbol *</Label>
+              <Label>{t("chains.addDialog.nativeSymbol")}</Label>
               <Input
                 required
                 value={form.native_symbol}
@@ -116,7 +118,7 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Decimals *</Label>
+              <Label>{t("chains.addDialog.decimals")}</Label>
               <Input
                 required
                 type="number"
@@ -128,7 +130,7 @@ export function AddChainDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>xpub *</Label>
+            <Label>{t("chains.addDialog.xpub")}</Label>
             <Input
               required
               value={form.xpub}
@@ -139,7 +141,7 @@ export function AddChainDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>RPC URLs *</Label>
+            <Label>{t("chains.addDialog.rpcUrls")}</Label>
             {form.rpc_urls.map((url, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <Input
@@ -168,13 +170,13 @@ export function AddChainDialog({
               onClick={handleRpcAdd}
             >
               <Plus className="size-3" />
-              Add URL
+              {t("chains.addDialog.addUrl")}
             </Button>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-1.5">
-              <Label>Block Lag</Label>
+              <Label>{t("chains.addDialog.blockLag")}</Label>
               <Input
                 type="number"
                 min={0}
@@ -183,7 +185,7 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Confirmations</Label>
+              <Label>{t("chains.addDialog.confirmations")}</Label>
               <Input
                 type="number"
                 min={0}
@@ -192,7 +194,7 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Start Block</Label>
+              <Label>{t("chains.addDialog.startBlock")}</Label>
               <Input
                 type="number"
                 min={0}
@@ -203,7 +205,7 @@ export function AddChainDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Logo URL</Label>
+            <Label>{t("chains.addDialog.logoUrl")}</Label>
             <Input
               value={form.logo_url ?? ""}
               onChange={(e) => setForm({ ...form, logo_url: e.target.value || null })}
@@ -216,15 +218,15 @@ export function AddChainDialog({
               checked={form.active}
               onCheckedChange={(v) => setForm({ ...form, active: v })}
             />
-            <Label>Active</Label>
+            <Label>{t("chains.addDialog.active")}</Label>
           </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => handleClose(false)} disabled={loading}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Adding..." : "Add Chain"}
+              {loading ? t("common.adding") : t("chains.addChain")}
             </Button>
           </DialogFooter>
         </form>
