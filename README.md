@@ -91,9 +91,6 @@ The whole thing is a static SPA. No server-side rendering, no Node runtime in pr
 
 ## Installing and Launching
 
-(soon)
-
-<!-- 
 ### 1. Preparation
 
 Make sure Docker is installed, then grab the compose file:
@@ -118,8 +115,10 @@ Open `.env` and fill in two values:
 
 | Variable | Description |
 |----------|-------------|
-| `BACKEND_URL` | Full URL to your [necko3-backend](https://github.com/necko-moe/necko3-backend) instance (e.g. `https://api.necko.moe`). The admin panel sends every API call here. |
+| `BACKEND_URL` | Full URL to your [necko3-backend](https://github.com/necko-moe/necko3-backend) instance (e.g. `https://api.necko.moe`). The admin panel sends every API call here via nginx reverse proxy. |
 | `PAYMENT_URL` | Full URL to your [necko3-payment-page](https://github.com/necko-moe/necko3-payment-page) instance (e.g. `https://payment.necko.moe`). Used to generate customer-facing payment links. |
+
+Both values are injected at container startup — no rebuild needed when they change.
 
 ### 3. Launch
 
@@ -127,11 +126,11 @@ Open `.env` and fill in two values:
 docker compose up -d && docker compose logs -f -t
 ```
 
-The panel will be available on `127.0.0.1:2537`.
+The panel will be available on `127.0.0.1:3636`.
 
 ### 4. TLS / Reverse Proxy
 
-The container binds to **localhost only** — it does not expose itself to the internet by default. Set up a reverse proxy (Nginx, Caddy, Traefik — whatever your soul desires) with TLS certificates pointing to `127.0.0.1:2537`.
+The container binds to **localhost only** — it does not expose itself to the internet by default. Set up a reverse proxy (Nginx, Caddy, Traefik — whatever your soul desires) with TLS certificates pointing to `127.0.0.1:3636`.
 
 Or just expose the port to the world if plaintext HTTP and the total absence of encryption don't bother you _(please let them bother you)_.
 
@@ -146,10 +145,9 @@ services:
     restart: unless-stopped
     env_file: .env
     ports:
-      - "127.0.0.1:2537:80"
+      - "127.0.0.1:3636:80"
 ```
 </details>
- -->
 
 ## Development
 
