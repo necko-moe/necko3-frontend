@@ -27,8 +27,9 @@ import {
   Webhook,
   CreditCard,
 } from "lucide-react";
+import { getConfig } from "@/lib/config";
 
-const PAYMENT_URL = (import.meta.env.VITE_PAYMENT_URL as string) ?? "";
+const PAYMENT_URL = getConfig().PAYMENT_URL;
 
 interface InvoiceTableProps {
   invoices: InvoiceSchema[];

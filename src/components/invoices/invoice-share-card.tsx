@@ -12,8 +12,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Copy, Check, ExternalLink, Download } from "lucide-react";
+import { getConfig } from "@/lib/config";
 
-const PAYMENT_URL = (import.meta.env.VITE_PAYMENT_URL as string) ?? "";
+const PAYMENT_URL = getConfig().PAYMENT_URL;
 
 interface InvoiceShareCardProps {
   invoice: Pick<InvoiceSchema, "id" | "amount" | "token" | "network" | "address" | "created_at" | "expires_at">;

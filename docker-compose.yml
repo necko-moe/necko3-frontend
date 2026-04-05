@@ -1,0 +1,8 @@
+services:
+  frontend:
+    image: ghcr.io/necko-moe/necko3-frontend:latest
+    container_name: necko3-frontend
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:3636:80"

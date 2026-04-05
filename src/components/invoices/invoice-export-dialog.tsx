@@ -28,8 +28,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Sun, Moon, Download, Loader2, AlertCircle } from "lucide-react";
+import { getConfig } from "@/lib/config";
 
-const PAYMENT_URL = (import.meta.env.VITE_PAYMENT_URL as string) ?? "";
+const PAYMENT_URL = getConfig().PAYMENT_URL;
 
 const QR_LIGHT_DOTS = "#2a526a";
 const QR_LIGHT_BG = "#faf0e7";
