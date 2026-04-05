@@ -22,9 +22,11 @@ import {
   ChevronRight,
   Loader2,
   RotateCcw,
+  Webhook,
 } from "lucide-react";
 import { WebhookTable } from "@/components/webhooks/webhook-table";
 import { WebhookDetail } from "@/components/webhooks/webhook-detail";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const PAGE_SIZE = 20;
 const STATUSES: WebhookStatus[] = [
@@ -292,6 +294,12 @@ export function WebhooksPage() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
         </div>
+      ) : webhooks.length === 0 ? (
+        <EmptyState
+          icon={Webhook}
+          title={t("webhooks.emptyTitle")}
+          description={t("webhooks.emptyDescription")}
+        />
       ) : (
         <WebhookTable webhooks={webhooks} onSelect={handleSelect} />
       )}

@@ -90,6 +90,8 @@
     "searchPlaceholder": "Пошук мереж...",
     "addChain": "Додати мережу",
     "emptyState": "Мережі ще не налаштовані. Додайте першу мережу для початку.",
+    "emptyTitle": "Мережі не налаштовані",
+    "emptyDescription": "Додайте першу мережу, щоб почати приймати платежі.",
     "noResults": "Немає мереж, що відповідають запиту.",
     "failedToLoad": "Не вдалося завантажити мережі",
     "failedToAdd": "Не вдалося додати мережу",
@@ -169,6 +171,8 @@
     "total_few": "{{count}} рахунки всього",
     "total_many": "{{count}} рахунків всього",
     "noInvoicesFound": "Рахунки не знайдено.",
+    "emptyTitle": "Рахунків поки немає",
+    "emptyDescription": "Створіть перший рахунок для початку роботи.",
     "failedToLoad": "Не вдалося завантажити рахунок",
     "table": {
       "status": "Статус",
@@ -228,6 +232,27 @@
       "webhookSecret": "Секрет вебхуку",
       "maxRetries": "Макс. повторів",
       "failedToCreate": "Не вдалося створити рахунок"
+    },
+    "share": {
+      "title": "Сплатити {{amount}} {{token}} у {{network}}",
+      "copyLink": "Скопіювати",
+      "openInTab": "Відкрити",
+      "exportCard": "Експорт",
+      "done": "Готово",
+      "created": "Рахунок створено",
+      "createdDescription": "Поділіться посиланням на оплату з вашим клієнтом.",
+      "scanToPay": "Скануйте для оплати",
+      "invoiceLabel": "Рахунок",
+      "addressLabel": "Адреса",
+      "createdLabel": "Створено",
+      "expiresLabel": "Спливає",
+      "exportTitle": "Експорт картки",
+      "exportDescription": "Оберіть тему та мову.",
+      "themeLight": "Світла",
+      "themeDark": "Темна",
+      "exportLanguage": "Мова",
+      "exportDownload": "Завантажити PNG",
+      "exportError": "Не вдалося відрендерити картку"
     }
   },
   "payments": {
@@ -243,6 +268,8 @@
     "total_few": "{{count}} платежі всього",
     "total_many": "{{count}} платежів всього",
     "noPaymentsFound": "Платежі не знайдено.",
+    "emptyTitle": "Платежів поки немає",
+    "emptyDescription": "Платежі з'являться тут при виявленні транзакцій.",
     "failedToLoad": "Не вдалося завантажити платіж",
     "table": {
       "status": "Статус",
@@ -289,6 +316,8 @@
     "total_few": "{{count}} вебхуки всього",
     "total_many": "{{count}} вебхуків всього",
     "noWebhooksFound": "Вебхуки не знайдено.",
+    "emptyTitle": "Вебхуків поки немає",
+    "emptyDescription": "Вебхуки з'являться тут при спрацюванні подій.",
     "failedToLoad": "Не вдалося завантажити вебхук",
     "copyUrl": "Скопіювати URL",
     "openInvoice": "Відкрити рахунок",

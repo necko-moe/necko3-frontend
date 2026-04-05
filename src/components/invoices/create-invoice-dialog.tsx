@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
+import type { InvoiceSchema } from "@/types/invoice";
 import type { CreateInvoiceReq } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch, apiFetchSilent } from "@/lib/api";
@@ -25,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { InvoiceShareCard } from "@/components/invoices/invoice-share-card";
 
 interface CreateInvoiceDialogProps {
   open: boolean;
@@ -55,6 +57,7 @@ export function CreateInvoiceDialog({
   const [webhookMaxRetries, setWebhookMaxRetries] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [createdInvoice, setCreatedInvoice] = useState<InvoiceSchema | null>(null);
 
   const fetchChains = useCallback(async () => {
     if (!apiKey) return;
@@ -99,10 +102,14 @@ export function CreateInvoiceDialog({
     setWebhookUrl("");
     setWebhookSecret("");
     setWebhookMaxRetries("");
+    setCreatedInvoice(null);
   }
 
   function handleClose(v: boolean) {
-    if (!v) reset();
+    if (!v) {
+      if (createdInvoice) onCreated();
+      reset();
+    }
     onOpenChange(v);
   }
 
@@ -130,7 +137,7 @@ export function CreateInvoiceDialog({
 
     setSubmitting(true);
     try {
-      const res = await apiFetch<unknown>("/invoice", apiKey, {
+      const res = await apiFetch<InvoiceSchema>("/invoice", apiKey, {
         method: "POST",
         body: JSON.stringify(body),
       });
@@ -138,13 +145,37 @@ export function CreateInvoiceDialog({
         toast.error(res.message ?? t("invoices.create.failedToCreate"));
         return;
       }
-      handleClose(false);
-      onCreated();
+      if (res.data) {
+        setCreatedInvoice(res.data);
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (createdInvoice) {
+    return (
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("invoices.share.created")}</DialogTitle>
+            <DialogDescription>
+              {t("invoices.share.createdDescription")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <InvoiceShareCard invoice={createdInvoice} compact />
+
+          <DialogFooter>
+            <Button className="w-full" onClick={() => handleClose(false)}>
+              {t("invoices.share.done")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

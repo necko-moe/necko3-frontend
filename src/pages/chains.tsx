@@ -7,7 +7,8 @@ import { apiFetch } from "@/lib/api";
 import { ErrorBlock } from "@/components/error-block";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowDownAZ, ArrowUpZA, Plus, Loader2 } from "lucide-react";
+import { ArrowDownAZ, ArrowUpZA, Link2, Plus, Loader2 } from "lucide-react";
+import { EmptyState } from "@/components/shared/empty-state";
 import { ChainCard } from "@/components/chains/chain-card";
 import { ChainDetail } from "@/components/chains/chain-detail";
 import { AddChainDialog } from "@/components/chains/add-chain-dialog";
@@ -174,11 +175,12 @@ export function ChainsPage() {
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
         </div>
       ) : filtered.length === 0 ? (
-        <p className="py-20 text-center text-sm text-muted-foreground">
-          {chains.length === 0
-            ? t("chains.emptyState")
-            : t("chains.noResults")}
-        </p>
+        <EmptyState
+          icon={Link2}
+          title={chains.length === 0 ? t("chains.emptyTitle") : t("chains.noResults")}
+          description={chains.length === 0 ? t("chains.emptyDescription") : undefined}
+          action={chains.length === 0 ? { label: t("chains.addChain"), onClick: () => setAddOpen(true) } : undefined}
+        />
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {filtered.map((chain) => (

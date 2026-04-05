@@ -90,6 +90,8 @@
     "searchPlaceholder": "Поиск сетей...",
     "addChain": "Добавить сеть",
     "emptyState": "Сети ещё не настроены. Добавьте первую сеть для начала.",
+    "emptyTitle": "Сети не настроены",
+    "emptyDescription": "Добавьте первую сеть, чтобы начать принимать платежи.",
     "noResults": "Нет сетей, соответствующих запросу.",
     "failedToLoad": "Не удалось загрузить сети",
     "failedToAdd": "Не удалось добавить сеть",
@@ -169,6 +171,8 @@
     "total_few": "{{count}} счёта всего",
     "total_many": "{{count}} счётов всего",
     "noInvoicesFound": "Счета не найдены.",
+    "emptyTitle": "Счетов пока нет",
+    "emptyDescription": "Создайте первый счёт для начала работы.",
     "failedToLoad": "Не удалось загрузить счёт",
     "table": {
       "status": "Статус",
@@ -228,6 +232,27 @@
       "webhookSecret": "Секрет вебхука",
       "maxRetries": "Макс. повторов",
       "failedToCreate": "Не удалось создать счёт"
+    },
+    "share": {
+      "title": "Оплатить {{amount}} {{token}} в {{network}}",
+      "copyLink": "Скопировать",
+      "openInTab": "Открыть",
+      "exportCard": "Экспорт",
+      "done": "Готово",
+      "created": "Счёт создан",
+      "createdDescription": "Поделитесь ссылкой на оплату с вашим клиентом.",
+      "scanToPay": "Сканируйте для оплаты",
+      "invoiceLabel": "Счёт",
+      "addressLabel": "Адрес",
+      "createdLabel": "Создан",
+      "expiresLabel": "Истекает",
+      "exportTitle": "Экспорт карточки",
+      "exportDescription": "Выберите тему и язык.",
+      "themeLight": "Светлая",
+      "themeDark": "Тёмная",
+      "exportLanguage": "Язык",
+      "exportDownload": "Скачать PNG",
+      "exportError": "Не удалось отрисовать карточку"
     }
   },
   "payments": {
@@ -243,6 +268,8 @@
     "total_few": "{{count}} платежа всего",
     "total_many": "{{count}} платежей всего",
     "noPaymentsFound": "Платежи не найдены.",
+    "emptyTitle": "Платежей пока нет",
+    "emptyDescription": "Платежи появятся здесь при обнаружении транзакций.",
     "failedToLoad": "Не удалось загрузить платёж",
     "table": {
       "status": "Статус",
@@ -289,6 +316,8 @@
     "total_few": "{{count}} вебхука всего",
     "total_many": "{{count}} вебхуков всего",
     "noWebhooksFound": "Вебхуки не найдены.",
+    "emptyTitle": "Вебхуков пока нет",
+    "emptyDescription": "Вебхуки появятся здесь при срабатывании событий.",
     "failedToLoad": "Не удалось загрузить вебхук",
     "copyUrl": "Скопировать URL",
     "openInvoice": "Открыть счёт",

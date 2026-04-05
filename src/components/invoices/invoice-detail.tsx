@@ -2,8 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import { formatDistanceToNow, format, isPast } from "date-fns";
-import { useDateLocale } from "@/lib/date-locale";
 import type { InvoiceSchema } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
@@ -12,17 +10,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { CopyField, InfoRow, TimeField } from "@/components/shared/detail-primitives";
+import { InvoiceShareCard } from "@/components/invoices/invoice-share-card";
 import { ConfirmDeleteDialog } from "@/components/chains/confirm-delete-dialog";
 import {
   ArrowLeft,
-  Copy,
-  Check,
-  ExternalLink,
   CreditCard,
   Webhook,
   XCircle,
@@ -36,8 +28,6 @@ import {
   Link2,
   RotateCcw,
 } from "lucide-react";
-
-const PAYMENT_URL = (import.meta.env.VITE_PAYMENT_URL as string) ?? "";
 
 interface InvoiceDetailProps {
   invoice: InvoiceSchema;
@@ -55,86 +45,6 @@ const statusConfig: Record<
   Cancelled: { dot: "bg-destructive/60", badge: "destructive" },
 };
 
-function CopyField({ value, mono }: { value: string; mono?: boolean }) {
-  const { t } = useTranslation();
-  const [copied, setCopied] = useState(false);
-
-  function handleCopy() {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className={cn(
-            "group flex items-center gap-1.5 text-left transition-colors hover:text-primary",
-            mono && "font-mono text-xs",
-          )}
-        >
-          <span className="truncate">{value}</span>
-          {copied ? (
-            <Check className="size-3 shrink-0 text-emerald-600" />
-          ) : (
-            <Copy className="size-3 shrink-0 opacity-0 group-hover:opacity-60" />
-          )}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent>{copied ? t("common.copied") : t("common.clickToCopy")}</TooltipContent>
-    </Tooltip>
-  );
-}
-
-function InfoRow({
-  icon: Icon,
-  label,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex items-start gap-3 py-2">
-      <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-      <div className="min-w-0 flex-1">
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {label}
-        </p>
-        <div className="mt-0.5 text-sm font-medium">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-function TimeField({ date, isExpiry }: { date: string; isExpiry?: boolean }) {
-  const dateLocale = useDateLocale();
-  const d = new Date(date);
-  const past = isPast(d);
-  const relative = formatDistanceToNow(d, { addSuffix: true, locale: dateLocale });
-  const exact = format(d, "PPpp", { locale: dateLocale });
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          className={cn(
-            isExpiry && past && "text-destructive/80",
-            isExpiry && !past && "text-foreground",
-          )}
-        >
-          {relative}
-        </span>
-      </TooltipTrigger>
-      <TooltipContent>{exact}</TooltipContent>
-    </Tooltip>
-  );
-}
-
 export function InvoiceDetail({
   invoice,
   onBack,
@@ -147,10 +57,8 @@ export function InvoiceDetail({
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [secretVisible, setSecretVisible] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
 
   const cfg = statusConfig[invoice.status] ?? statusConfig.Pending;
-  const paymentLink = `${PAYMENT_URL}/${invoice.id}`;
 
   async function handleCancel() {
     if (!apiKey) return;
@@ -172,12 +80,6 @@ export function InvoiceDetail({
     } finally {
       setCancelling(false);
     }
-  }
-
-  function handleCopyLink() {
-    navigator.clipboard.writeText(paymentLink);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 1500);
   }
 
   return (
@@ -203,22 +105,6 @@ export function InvoiceDetail({
 
       {/* Action buttons */}
       <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" onClick={handleCopyLink}>
-          {linkCopied ? (
-            <Check className="size-3.5 text-emerald-600" />
-          ) : (
-            <Link2 className="size-3.5" />
-          )}
-          {linkCopied ? t("common.copied") : t("invoices.detail.copyPaymentLink")}
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => window.open(paymentLink, "_blank")}
-        >
-          <ExternalLink className="size-3.5" />
-          {t("invoices.detail.openPaymentPage")}
-        </Button>
         <Button
           variant="outline"
           size="sm"
@@ -248,60 +134,59 @@ export function InvoiceDetail({
       </div>
 
       {/* Main content */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {/* Left: invoice info */}
-        <Card>
-          <CardContent className="space-y-1 pt-4">
-            <InfoRow icon={Hash} label={t("invoices.detail.invoiceId")}>
-              <CopyField value={invoice.id} mono />
-            </InfoRow>
-
-            <InfoRow icon={Wallet} label={t("invoices.detail.depositAddress")}>
-              <CopyField value={invoice.address} mono />
-            </InfoRow>
-
-            <Separator />
-
-            <InfoRow icon={Coins} label={t("invoices.detail.amount")}>
-              <span>
-                {invoice.amount} {invoice.token}
-              </span>
-            </InfoRow>
-
-            <InfoRow icon={Coins} label={t("invoices.detail.paid")}>
-              <span>
-                {invoice.paid} {invoice.token}
-              </span>
-            </InfoRow>
-
-            <Separator />
-
-            <InfoRow icon={Globe} label={t("invoices.detail.network")}>
-              {invoice.network}
-            </InfoRow>
-
-            <InfoRow icon={Hash} label={t("invoices.detail.decimals")}>
-              {invoice.decimals}
-            </InfoRow>
-
-            <InfoRow icon={Hash} label={t("invoices.detail.addressIndex")}>
-              {invoice.address_index}
-            </InfoRow>
-
-            <Separator />
-
-            <InfoRow icon={Clock} label={t("invoices.detail.created")}>
-              <TimeField date={invoice.created_at} />
-            </InfoRow>
-
-            <InfoRow icon={Clock} label={t("invoices.detail.expires")}>
-              <TimeField date={invoice.expires_at} isExpiry />
-            </InfoRow>
-          </CardContent>
-        </Card>
-
-        {/* Right: webhook info */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_auto]">
+        {/* Left column: data cards */}
         <div className="space-y-6">
+          <Card>
+            <CardContent className="space-y-1 pt-4">
+              <InfoRow icon={Hash} label={t("invoices.detail.invoiceId")}>
+                <CopyField value={invoice.id} mono />
+              </InfoRow>
+
+              <InfoRow icon={Wallet} label={t("invoices.detail.depositAddress")}>
+                <CopyField value={invoice.address} mono />
+              </InfoRow>
+
+              <Separator />
+
+              <InfoRow icon={Coins} label={t("invoices.detail.amount")}>
+                <span>
+                  {invoice.amount} {invoice.token}
+                </span>
+              </InfoRow>
+
+              <InfoRow icon={Coins} label={t("invoices.detail.paid")}>
+                <span>
+                  {invoice.paid} {invoice.token}
+                </span>
+              </InfoRow>
+
+              <Separator />
+
+              <InfoRow icon={Globe} label={t("invoices.detail.network")}>
+                {invoice.network}
+              </InfoRow>
+
+              <InfoRow icon={Hash} label={t("invoices.detail.decimals")}>
+                {invoice.decimals}
+              </InfoRow>
+
+              <InfoRow icon={Hash} label={t("invoices.detail.addressIndex")}>
+                {invoice.address_index}
+              </InfoRow>
+
+              <Separator />
+
+              <InfoRow icon={Clock} label={t("invoices.detail.created")}>
+                <TimeField date={invoice.created_at} />
+              </InfoRow>
+
+              <InfoRow icon={Clock} label={t("invoices.detail.expires")}>
+                <TimeField date={invoice.expires_at} warn />
+              </InfoRow>
+            </CardContent>
+          </Card>
+
           {invoice.webhook_url && (
             <Card>
               <CardContent className="space-y-1 pt-4">
@@ -346,7 +231,6 @@ export function InvoiceDetail({
             </Card>
           )}
 
-          {/* Raw data card */}
           <Card>
             <CardContent className="pt-4">
               <h3 className="mb-2 text-sm font-medium text-muted-foreground">
@@ -364,6 +248,13 @@ export function InvoiceDetail({
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Right column: share card */}
+        <div className="lg:w-[320px]">
+          <div className="lg:sticky lg:top-8">
+            <InvoiceShareCard invoice={invoice} />
+          </div>
         </div>
       </div>
 

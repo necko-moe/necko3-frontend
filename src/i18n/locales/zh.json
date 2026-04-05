@@ -90,6 +90,8 @@
     "searchPlaceholder": "搜索链...",
     "addChain": "添加链",
     "emptyState": "尚未配置任何链。添加您的第一条链以开始使用。",
+    "emptyTitle": "尚未配置链",
+    "emptyDescription": "添加您的第一条链以开始接受付款。",
     "noResults": "没有匹配的链。",
     "failedToLoad": "无法加载链",
     "failedToAdd": "添加链失败",
@@ -167,6 +169,8 @@
     "createInvoice": "创建账单",
     "total_other": "共 {{count}} 张账单",
     "noInvoicesFound": "未找到账单。",
+    "emptyTitle": "暂无账单",
+    "emptyDescription": "创建您的第一张账单以开始使用。",
     "failedToLoad": "无法加载账单",
     "table": {
       "status": "状态",
@@ -226,6 +230,27 @@
       "webhookSecret": "Webhook 密钥",
       "maxRetries": "最大重试次数",
       "failedToCreate": "创建账单失败"
+    },
+    "share": {
+      "title": "支付 {{amount}} {{token}} 于 {{network}}",
+      "copyLink": "复制链接",
+      "openInTab": "打开",
+      "exportCard": "导出",
+      "done": "完成",
+      "created": "账单已创建",
+      "createdDescription": "将此支付链接分享给您的客户。",
+      "scanToPay": "扫码支付",
+      "invoiceLabel": "账单",
+      "addressLabel": "地址",
+      "createdLabel": "创建时间",
+      "expiresLabel": "过期时间",
+      "exportTitle": "导出卡片",
+      "exportDescription": "选择主题和语言。",
+      "themeLight": "浅色",
+      "themeDark": "深色",
+      "exportLanguage": "语言",
+      "exportDownload": "下载 PNG",
+      "exportError": "渲染卡片失败"
     }
   },
   "payments": {
@@ -239,6 +264,8 @@
     "blockNumber": "区块号...",
     "total_other": "共 {{count}} 笔付款",
     "noPaymentsFound": "未找到付款。",
+    "emptyTitle": "暂无付款",
+    "emptyDescription": "检测到交易时，付款将在此显示。",
     "failedToLoad": "无法加载付款",
     "table": {
       "status": "状态",
@@ -283,6 +310,8 @@
     "url": "URL...",
     "total_other": "共 {{count}} 个 Webhook",
     "noWebhooksFound": "未找到 Webhook。",
+    "emptyTitle": "暂无 Webhook",
+    "emptyDescription": "事件触发时，Webhook 将在此显示。",
     "failedToLoad": "无法加载 Webhook",
     "copyUrl": "复制 URL",
     "openInvoice": "查看账单",

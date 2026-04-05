@@ -90,6 +90,8 @@
     "searchPlaceholder": "Search chains...",
     "addChain": "Add Chain",
     "emptyState": "No chains configured yet. Add your first chain to get started.",
+    "emptyTitle": "No chains configured",
+    "emptyDescription": "Add your first chain to start accepting payments.",
     "noResults": "No chains match your search.",
     "failedToLoad": "Could not load chains",
     "failedToAdd": "Failed to add chain",
@@ -168,6 +170,8 @@
     "total_one": "{{count}} invoice total",
     "total_other": "{{count}} invoices total",
     "noInvoicesFound": "No invoices found.",
+    "emptyTitle": "No invoices yet",
+    "emptyDescription": "Create your first invoice to get started.",
     "failedToLoad": "Could not load invoice",
     "table": {
       "status": "Status",
@@ -227,6 +231,27 @@
       "webhookSecret": "Webhook Secret",
       "maxRetries": "Max Retries",
       "failedToCreate": "Failed to create invoice"
+    },
+    "share": {
+      "title": "Pay {{amount}} {{token}} on {{network}}",
+      "copyLink": "Copy Link",
+      "openInTab": "Open",
+      "exportCard": "Export",
+      "done": "Done",
+      "created": "Invoice Created",
+      "createdDescription": "Share this payment link with your customer.",
+      "scanToPay": "Scan to pay",
+      "invoiceLabel": "Invoice",
+      "addressLabel": "Address",
+      "createdLabel": "Created",
+      "expiresLabel": "Expires",
+      "exportTitle": "Export Card",
+      "exportDescription": "Choose theme and language.",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "exportLanguage": "Language",
+      "exportDownload": "Download PNG",
+      "exportError": "Failed to render card"
     }
   },
   "payments": {
@@ -241,6 +266,8 @@
     "total_one": "{{count}} payment total",
     "total_other": "{{count}} payments total",
     "noPaymentsFound": "No payments found.",
+    "emptyTitle": "No payments found",
+    "emptyDescription": "Payments will appear here when transactions are detected.",
     "failedToLoad": "Could not load payment",
     "table": {
       "status": "Status",
@@ -286,6 +313,8 @@
     "total_one": "{{count}} webhook total",
     "total_other": "{{count}} webhooks total",
     "noWebhooksFound": "No webhooks found.",
+    "emptyTitle": "No webhooks found",
+    "emptyDescription": "Webhooks will appear here when events are triggered.",
     "failedToLoad": "Could not load webhook",
     "copyUrl": "Copy URL",
     "openInvoice": "Open invoice",

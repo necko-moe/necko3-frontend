@@ -24,12 +24,14 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  CreditCard,
   Loader2,
   RotateCcw,
   SlidersHorizontal,
 } from "lucide-react";
 import { PaymentTable } from "@/components/payments/payment-table";
 import { PaymentDetail } from "@/components/payments/payment-detail";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const PAGE_SIZE = 20;
 const STATUSES: PaymentStatus[] = ["Confirming", "Confirmed", "Cancelled"];
@@ -375,6 +377,12 @@ export function PaymentsPage() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
         </div>
+      ) : payments.length === 0 ? (
+        <EmptyState
+          icon={CreditCard}
+          title={t("payments.emptyTitle")}
+          description={t("payments.emptyDescription")}
+        />
       ) : (
         <PaymentTable payments={payments} onSelect={handleSelect} />
       )}

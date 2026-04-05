@@ -31,8 +31,10 @@ The whole thing is a static SPA. No server-side rendering, no Node runtime in pr
 - **Chain management** — add, edit, and delete blockchain networks. Configure your xpub, multiple RPC endpoints _(it will rotate through them if one goes down)_, confirmation thresholds, and block lag.
 - **Token configuration** — attach ERC-20 tokens (USDC, USDT, whatever your chain supports) to any network. Set the contract address, decimals, and you're done.
 - **Invoice lifecycle** — create invoices, monitor their status in real-time, cancel them if plans change, and generate [payment links](https://github.com/necko-moe/necko3-payment-page) for your customers.
+- **Invoice card export** — generate a shareable PNG card for any invoice, complete with a QR code, payment details, and a choice of light/dark theme and language.
 - **Payment tracking** — paginated, filterable list of every payment attempt. Drill into any row for on-chain details, block numbers, and confirmation progress.
 - **Webhook inspector** — see every webhook delivery, its status, retry count, and next attempt time. Cancel pending jobs if your endpoint moved to a farm upstate.
+- **Multilingual** — full i18n with English, Russian, Ukrainian, and Chinese. Language is auto-detected from the browser and can be switched on the fly.
 - **Dark / light theme** — persisted in `localStorage`, applied before first paint _(no white flash of death in dark mode)_.
 - **Fully responsive** — collapsible sidebar on desktop, sheet drawer on mobile. Looks good on everything from an iPhone SE to an ultrawide.
 - **Static build output** — deploy anywhere: Nginx, Caddy, S3, a Raspberry Pi, that one server in your closet. If it can serve HTML, it can run this.
@@ -72,7 +74,10 @@ The whole thing is a static SPA. No server-side rendering, no Node runtime in pr
 | State | Zero libraries — React Context + URL search params |
 | Fonts & Icons | Geist, Lucide |
 | Toasts | Sonner |
+| i18n | i18next + react-i18next |
 | Dates | date-fns |
+| QR Codes | qr-code-styling |
+| Image Export | modern-screenshot |
 
 ## Pages
 

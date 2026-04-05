@@ -20,6 +20,7 @@ import {
   ArrowLeft,
   ChevronLeft,
   ChevronRight,
+  FileText,
   Loader2,
   Plus,
   RotateCcw,
@@ -27,6 +28,7 @@ import {
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { InvoiceDetail } from "@/components/invoices/invoice-detail";
 import { CreateInvoiceDialog } from "@/components/invoices/create-invoice-dialog";
+import { EmptyState } from "@/components/shared/empty-state";
 
 const PAGE_SIZE = 20;
 const STATUSES: InvoiceStatus[] = ["Pending", "Paid", "Expired", "Cancelled"];
@@ -388,6 +390,13 @@ export function InvoicesPage() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="size-6 animate-spin text-muted-foreground" />
         </div>
+      ) : invoices.length === 0 ? (
+        <EmptyState
+          icon={FileText}
+          title={t("invoices.emptyTitle")}
+          description={t("invoices.emptyDescription")}
+          action={!hasFilters ? { label: t("invoices.createInvoice"), onClick: () => setCreateOpen(true) } : undefined}
+        />
       ) : (
         <InvoiceTable invoices={invoices} onSelect={handleSelect} />
       )}
