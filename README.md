@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://github.com/necko-moe/necko3-frontend">
-    <img src=".github/static/necko3-3-1-round.png" alt="necko3-3-1-round.png" width="256"/>
+    <img src=".github/assets/necko3-3-1-round.png" alt="necko3-3-1-round.png" width="256"/>
   </a>
   <h1>necko3-frontend</h1>
 
@@ -192,6 +192,6 @@ The project and all repositories are distributed under the **MIT License**. Feel
     You can just <a href="https://github.com/necko-moe/necko3-frontend/stargazers"><b>⭐ Star this repo</b></a> to show your love. It really helps!
   </p>
   <a href="https://github.com/necko-moe">
-    <img src=".github/static/necko3-2-200.png" alt="necko3 support banner" width="1024"/>
+    <img src=".github/assets/necko3-2-200.png" alt="necko3 support banner" width="1024"/>
   </a>
 </div>
