@@ -19,15 +19,20 @@ export interface InvoiceSchema {
   webhook_max_retries: number | null;
 }
 
-export interface CreateInvoiceReq {
-  amount: string;
-  token: string;
-  network: string;
-  expire_after?: number | null;
-  webhook_url?: string | null;
-  webhook_secret?: string | null;
-  webhook_max_retries?: number | null;
+export interface WebhookConfigSchema {
+  url: string;
+  secret?: string | null;
+  max_retries?: number | null;
 }
+
+export interface CreateInvoiceReq {
+  amount: number;
+  asset: string;
+  network: string;
+  duration?: number | null;
+  webhook_config?: WebhookConfigSchema | null;
+}
+
 
 export interface PaginatedResponse<T> {
   items: T[];

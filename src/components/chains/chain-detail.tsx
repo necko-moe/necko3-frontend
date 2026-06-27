@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type {
-  ChainConfigSchema,
+  ChainDataSchema,
   PartialChainUpdateSchema,
   TokenConfigSchema,
+  TokenDataSchema,
 } from "@/types/chain";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
@@ -12,17 +14,25 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, FileText, CreditCard, ChevronLeft, ChevronRight } from "lucide-react";
 import { ChainInfoFields } from "./chain-info-fields";
 import { TokenList } from "./token-list";
 import { AddTokenDialog } from "./add-token-dialog";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
+import { CopyField } from "@/components/shared/detail-primitives";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+const ADDR_PAGE_SIZE = 8;
 
 interface ChainDetailProps {
-  chain: ChainConfigSchema;
+  chain: ChainDataSchema;
   onBack: () => void;
   onChainDeleted: () => void;
-  onChainUpdated: (updated: ChainConfigSchema) => void;
+  onChainUpdated: (updated: ChainDataSchema) => void;
 }
 
 export function ChainDetail({
@@ -31,11 +41,12 @@ export function ChainDetail({
   onChainDeleted,
   onChainUpdated,
 }: ChainDetailProps) {
+  const navigate = useNavigate();
   const { apiKey } = useAuth();
   const { t } = useTranslation();
 
   const [draft, setDraft] = useState<PartialChainUpdateSchema>({});
-  const [tokens, setTokens] = useState<TokenConfigSchema[]>([]);
+  const [tokens, setTokens] = useState<TokenDataSchema[]>([]);
   const [tokensLoading, setTokensLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -43,21 +54,30 @@ export function ChainDetail({
   const [addTokenOpen, setAddTokenOpen] = useState(false);
   const [addingToken, setAddingToken] = useState(false);
   const [deletingToken, setDeletingToken] = useState<string | null>(null);
+  const [addrPage, setAddrPage] = useState(1);
 
   const activeValue = draft.active !== undefined ? draft.active! : chain.active;
+
+  const watchAddresses = chain.watch_addresses ?? [];
+  const addrTotalPages = Math.max(1, Math.ceil(watchAddresses.length / ADDR_PAGE_SIZE));
+  const addrSafePage = Math.min(addrPage, addrTotalPages);
+  const addrPageItems = watchAddresses.slice(
+    (addrSafePage - 1) * ADDR_PAGE_SIZE,
+    addrSafePage * ADDR_PAGE_SIZE,
+  );
 
   const fetchTokens = useCallback(async () => {
     if (!apiKey) return;
     setTokensLoading(true);
     try {
-      const res = await apiFetch<TokenConfigSchema[]>(
-        `/chain/${encodeURIComponent(chain.name)}/token`,
+      const res = await apiFetch<{ items: TokenDataSchema[] }>(
+        `/v1/chains/${encodeURIComponent(chain.name)}/tokens`,
         apiKey,
       );
       if (res.status === "error") {
         toast.error(res.message ?? t("chains.failedToLoadTokens"));
       } else if (res.data) {
-        setTokens(res.data);
+        setTokens(res.data.items || []);
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
@@ -77,14 +97,15 @@ export function ChainDetail({
     draft.logo_url !== undefined ||
     draft.required_confirmations !== undefined ||
     draft.rpc_urls !== undefined ||
-    draft.xpub !== undefined;
+    draft.xpub !== undefined ||
+    draft.safe_lag !== undefined;
 
   async function handleSave() {
     if (!apiKey || !isDirty) return;
     setSaving(true);
     try {
       const res = await apiFetch<never>(
-        `/chain/${encodeURIComponent(chain.name)}`,
+        `/v1/chains/${encodeURIComponent(chain.name)}`,
         apiKey,
         { method: "PATCH", body: JSON.stringify(draft) },
       );
@@ -92,15 +113,16 @@ export function ChainDetail({
         toast.error(res.message ?? t("chains.failedToSave"));
         return;
       }
-      const merged: ChainConfigSchema = {
+      const merged: ChainDataSchema = {
         ...chain,
-        active: draft.active ?? chain.active,
-        block_lag: draft.block_lag ?? chain.block_lag,
-        last_processed_block: draft.last_processed_block ?? chain.last_processed_block,
+        active: draft.active !== undefined ? draft.active ?? chain.active : chain.active,
+        block_lag: draft.block_lag !== undefined ? draft.block_lag ?? chain.block_lag : chain.block_lag,
+        last_processed_block: draft.last_processed_block !== undefined ? draft.last_processed_block ?? chain.last_processed_block : chain.last_processed_block,
         logo_url: draft.logo_url !== undefined ? draft.logo_url : chain.logo_url,
-        required_confirmations: draft.required_confirmations ?? chain.required_confirmations,
-        rpc_urls: draft.rpc_urls ?? chain.rpc_urls,
-        xpub: draft.xpub ?? chain.xpub,
+        required_confirmations: draft.required_confirmations !== undefined ? draft.required_confirmations ?? chain.required_confirmations : chain.required_confirmations,
+        rpc_urls: draft.rpc_urls !== undefined ? draft.rpc_urls ?? chain.rpc_urls : chain.rpc_urls,
+        xpub: draft.xpub !== undefined ? draft.xpub ?? chain.xpub : chain.xpub,
+        safe_lag: draft.safe_lag !== undefined ? draft.safe_lag ?? chain.safe_lag : chain.safe_lag,
       };
       onChainUpdated(merged);
       setDraft({});
@@ -120,7 +142,7 @@ export function ChainDetail({
     setDeleting(true);
     try {
       const res = await apiFetch<never>(
-        `/chain/${encodeURIComponent(chain.name)}`,
+        `/v1/chains/${encodeURIComponent(chain.name)}`,
         apiKey,
         { method: "DELETE" },
       );
@@ -142,7 +164,7 @@ export function ChainDetail({
     setAddingToken(true);
     try {
       const res = await apiFetch<never>(
-        `/chain/${encodeURIComponent(chain.name)}/token`,
+        `/v1/chains/${encodeURIComponent(chain.name)}/tokens`,
         apiKey,
         { method: "POST", body: JSON.stringify(token) },
       );
@@ -164,7 +186,7 @@ export function ChainDetail({
     setDeletingToken(symbol);
     try {
       const res = await apiFetch<never>(
-        `/chain/${encodeURIComponent(chain.name)}/token/${encodeURIComponent(symbol)}`,
+        `/v1/chains/${encodeURIComponent(chain.name)}/tokens/${encodeURIComponent(symbol)}`,
         apiKey,
         { method: "DELETE" },
       );
@@ -252,21 +274,114 @@ export function ChainDetail({
           </div>
         </div>
 
-        {/* Right panel -- tokens */}
-        <div className="min-w-0">
-          <h3 className="mb-4 font-heading text-base font-medium">{t("chains.tokens")}</h3>
-          {tokensLoading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">
-              {t("chains.loadingTokens")}
-            </p>
-          ) : (
-            <TokenList
-              tokens={tokens}
-              onAddToken={() => setAddTokenOpen(true)}
-              onDeleteToken={handleDeleteToken}
-              deletingToken={deletingToken}
-            />
-          )}
+        {/* Right panel -- tokens and watch addresses */}
+        <div className="min-w-0 space-y-8">
+          {/* Tokens section */}
+          <div className="min-w-0">
+            <h3 className="mb-4 font-heading text-base font-medium">{t("chains.tokens")}</h3>
+            {tokensLoading ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("chains.loadingTokens")}
+              </p>
+            ) : (
+              <TokenList
+                tokens={tokens}
+                onAddToken={() => setAddTokenOpen(true)}
+                onDeleteToken={handleDeleteToken}
+                deletingToken={deletingToken}
+              />
+            )}
+          </div>
+
+          <Separator />
+
+          {/* Watch Addresses section */}
+          <div className="min-w-0">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-heading text-base font-medium">{t("chains.watchAddresses")}</h3>
+              {watchAddresses.length > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  {watchAddresses.length}
+                </span>
+              )}
+            </div>
+
+            {watchAddresses.length === 0 ? (
+              <p className="py-8 text-center text-sm text-muted-foreground">
+                {t("chains.watchAddressList.emptyState")}
+              </p>
+            ) : (
+              <>
+                <div className="space-y-1">
+                  {addrPageItems.map((address) => (
+                    <div
+                      key={address}
+                      className="group/row flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted/50"
+                    >
+                      <div className="truncate text-xs font-mono text-muted-foreground flex-1">
+                        <CopyField value={address} mono />
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7"
+                              onClick={() => navigate(`/invoices?address=${encodeURIComponent(address)}`)}
+                            >
+                              <FileText className="size-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>{t("chains.watchAddressList.viewInvoices")}</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-7"
+                              onClick={() => navigate(`/payments?to=${encodeURIComponent(address)}`)}
+                            >
+                              <CreditCard className="size-3.5" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>{t("chains.watchAddressList.viewPayments")}</TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {addrTotalPages > 1 && (
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">
+                      {t("common.pageOf", { page: addrSafePage, totalPages: addrTotalPages })}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        disabled={addrSafePage <= 1}
+                        onClick={() => setAddrPage((p) => p - 1)}
+                      >
+                        <ChevronLeft className="size-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon-xs"
+                        disabled={addrSafePage >= addrTotalPages}
+                        onClick={() => setAddrPage((p) => p + 1)}
+                      >
+                        <ChevronRight className="size-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
+import type { ChainDataSchema, TokenDataSchema } from "@/types/chain";
 import type { InvoiceSchema, InvoiceStatus, PaginatedResponse } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch, apiFetchSilent } from "@/lib/api";
@@ -48,8 +48,8 @@ export function InvoicesPage() {
   const [invoices, setInvoices] = useState<InvoiceSchema[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [chains, setChains] = useState<ChainConfigSchema[]>([]);
-  const [filterTokens, setFilterTokens] = useState<TokenConfigSchema[]>([]);
+  const [chains, setChains] = useState<ChainDataSchema[]>([]);
+  const [filterTokens, setFilterTokens] = useState<TokenDataSchema[]>([]);
   const [filterTokensLoading, setFilterTokensLoading] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -82,8 +82,8 @@ export function InvoicesPage() {
 
   const fetchChains = useCallback(async () => {
     if (!apiKey) return;
-    const res = await apiFetchSilent<ChainConfigSchema[]>("/chain", apiKey);
-    if (res?.status === "success" && res.data) setChains(res.data);
+    const res = await apiFetchSilent<{ items: ChainDataSchema[] }>("/v1/chains", apiKey);
+    if (res?.status === "success" && res.data) setChains(res.data.items || []);
   }, [apiKey]);
 
   useEffect(() => {
@@ -97,12 +97,12 @@ export function InvoicesPage() {
       return;
     }
     setFilterTokensLoading(true);
-    apiFetchSilent<TokenConfigSchema[]>(
-      `/chain/${encodeURIComponent(networkFilter)}/token`,
+    apiFetchSilent<{ items: TokenDataSchema[] }>(
+      `/v1/chains/${encodeURIComponent(networkFilter)}/tokens`,
       apiKey,
     ).then((res) => {
       if (res?.status === "success" && res.data) {
-        setFilterTokens(res.data);
+        setFilterTokens(res.data.items || []);
       } else {
         setFilterTokens([]);
       }
@@ -130,19 +130,7 @@ export function InvoicesPage() {
     ) {
       return;
     }
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      next.delete("token");
-      next.delete("page");
-      return next;
-    });
-  }, [
-    networkFilter,
-    tokenFilter,
-    filterTokens,
-    filterTokensLoading,
-    setSearchParams,
-  ]);
+  }, [networkFilter, filterTokens, filterTokensLoading, tokenFilter]);
 
   const chainNames = useMemo(
     () => chains.map((c) => c.name).sort(),
@@ -163,7 +151,7 @@ export function InvoicesPage() {
 
     try {
       const res = await apiFetch<PaginatedResponse<InvoiceSchema>>(
-        `/invoice?${params.toString()}`,
+        `/v1/invoices?${params.toString()}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -193,7 +181,7 @@ export function InvoicesPage() {
     }
     try {
       const res = await apiFetch<InvoiceSchema>(
-        `/invoice/${encodeURIComponent(selectedId)}`,
+        `/v1/invoices/${encodeURIComponent(selectedId)}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -280,6 +268,9 @@ export function InvoicesPage() {
     );
   }
 
+  const selectedChain = chains.find((c) => c.name === networkFilter);
+  const nativeSymbol = selectedChain?.native_symbol;
+
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
@@ -345,6 +336,11 @@ export function InvoicesPage() {
           </SelectTrigger>
           <SelectContent position="popper" sideOffset={4}>
             <SelectItem value="__all__">{t("common.allTokens")}</SelectItem>
+            {nativeSymbol && (
+              <SelectItem key={nativeSymbol} value={nativeSymbol}>
+                {nativeSymbol} (Native)
+              </SelectItem>
+            )}
             {filterTokens.map((tk) => (
               <SelectItem key={tk.symbol} value={tk.symbol}>
                 {tk.symbol}

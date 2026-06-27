@@ -33,9 +33,8 @@ const statusConfig: Record<
 > = {
   Pending: { dot: "bg-amber-400", badge: "outline" },
   Processing: { dot: "bg-blue-400", badge: "outline" },
-  Sent: { dot: "bg-emerald-500", badge: "default" },
+  Delivered: { dot: "bg-emerald-500", badge: "default" },
   Failed: { dot: "bg-destructive/60", badge: "destructive" },
-  Cancelled: { dot: "bg-muted-foreground/50", badge: "secondary" },
 };
 
 function CopyButton({ value, label }: { value: string; label: string }) {

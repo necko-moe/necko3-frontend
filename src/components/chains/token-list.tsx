@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { TokenConfigSchema } from "@/types/chain";
+import type { TokenConfigSchema, TokenDataSchema } from "@/types/chain";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,8 @@ import {
 import {
   ArrowDownAZ,
   ArrowUpZA,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Check,
   Plus,
@@ -18,8 +20,10 @@ import {
 } from "lucide-react";
 import { ConfirmDeleteDialog } from "./confirm-delete-dialog";
 
+const PAGE_SIZE = 8;
+
 interface TokenListProps {
-  tokens: TokenConfigSchema[];
+  tokens: (TokenConfigSchema | TokenDataSchema)[];
   onAddToken: () => void;
   onDeleteToken: (symbol: string) => Promise<boolean>;
   deletingToken: string | null;
@@ -66,6 +70,7 @@ export function TokenList({
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
@@ -82,13 +87,23 @@ export function TokenList({
     return list;
   }, [tokens, search, sortAsc]);
 
+  // Reset to page 1 when search/sort changes
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pageItems = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  function handleSearchChange(q: string) {
+    setSearch(q);
+    setPage(1);
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <Input
           placeholder={t("chains.tokenList.searchPlaceholder")}
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => handleSearchChange(e.target.value)}
           className="flex-1"
         />
         <Button
@@ -110,7 +125,7 @@ export function TokenList({
         </p>
       ) : (
         <div className="space-y-1">
-          {filtered.map((token) => (
+          {pageItems.map((token) => (
             <div
               key={token.symbol}
               className="group/row flex items-center gap-3 rounded-lg px-3 py-2 transition-colors hover:bg-muted/50"
@@ -154,6 +169,33 @@ export function TokenList({
               </Tooltip>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">
+            {t("common.pageOf", { page: safePage, totalPages })}
+          </span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              disabled={safePage <= 1}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              <ChevronLeft className="size-3.5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              disabled={safePage >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              <ChevronRight className="size-3.5" />
+            </Button>
+          </div>
         </div>
       )}
 

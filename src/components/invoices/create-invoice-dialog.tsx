@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { ChainConfigSchema, TokenConfigSchema } from "@/types/chain";
+import type { ChainDataSchema, TokenDataSchema } from "@/types/chain";
 import type { InvoiceSchema } from "@/types/invoice";
 import type { CreateInvoiceReq } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
@@ -42,9 +42,9 @@ export function CreateInvoiceDialog({
   const { t } = useTranslation();
   const { apiKey } = useAuth();
 
-  const [chains, setChains] = useState<ChainConfigSchema[]>([]);
+  const [chains, setChains] = useState<ChainDataSchema[]>([]);
   const [chainsLoading, setChainsLoading] = useState(false);
-  const [tokens, setTokens] = useState<TokenConfigSchema[]>([]);
+  const [tokens, setTokens] = useState<TokenDataSchema[]>([]);
   const [tokensLoading, setTokensLoading] = useState(false);
 
   const [network, setNetwork] = useState("");
@@ -59,12 +59,15 @@ export function CreateInvoiceDialog({
   const [submitting, setSubmitting] = useState(false);
   const [createdInvoice, setCreatedInvoice] = useState<InvoiceSchema | null>(null);
 
+  const selectedChain = chains.find((c) => c.name === network);
+  const nativeSymbol = selectedChain?.native_symbol;
+
   const fetchChains = useCallback(async () => {
     if (!apiKey) return;
     setChainsLoading(true);
-    const res = await apiFetchSilent<ChainConfigSchema[]>("/chain", apiKey);
+    const res = await apiFetchSilent<{ items: ChainDataSchema[] }>("/v1/chains", apiKey);
     if (res?.status === "success" && res.data) {
-      setChains(res.data.filter((c) => c.active));
+      setChains((res.data.items || []).filter((c) => c.active));
     }
     setChainsLoading(false);
   }, [apiKey]);
@@ -80,12 +83,12 @@ export function CreateInvoiceDialog({
     }
     setToken("");
     setTokensLoading(true);
-    apiFetchSilent<TokenConfigSchema[]>(
-      `/chain/${encodeURIComponent(network)}/token`,
+    apiFetchSilent<{ items: TokenDataSchema[] }>(
+      `/v1/chains/${encodeURIComponent(network)}/tokens`,
       apiKey,
     ).then((res) => {
       if (res?.status === "success" && res.data) {
-        setTokens(res.data);
+        setTokens(res.data.items || []);
       } else {
         setTokens([]);
       }
@@ -118,26 +121,26 @@ export function CreateInvoiceDialog({
     if (!apiKey || !network || !token || !amount) return;
 
     const body: CreateInvoiceReq = {
-      amount,
-      token,
+      amount: parseFloat(amount),
+      asset: token,
       network,
     };
 
     const mins = parseFloat(expireMinutes);
-    if (mins > 0) body.expire_after = Math.round(mins * 60);
+    if (mins > 0) body.duration = Math.round(mins * 60);
 
     const url = webhookUrl.trim();
     if (url) {
-      body.webhook_url = url;
-      const secret = webhookSecret.trim();
-      if (secret) body.webhook_secret = secret;
-      const retries = parseInt(webhookMaxRetries);
-      if (retries >= 0) body.webhook_max_retries = retries;
+      body.webhook_config = {
+        url,
+        secret: webhookSecret.trim() || undefined,
+        max_retries: parseInt(webhookMaxRetries) >= 0 ? parseInt(webhookMaxRetries) : undefined,
+      };
     }
 
     setSubmitting(true);
     try {
-      const res = await apiFetch<InvoiceSchema>("/invoice", apiKey, {
+      const res = await apiFetch<InvoiceSchema>("/v1/invoices", apiKey, {
         method: "POST",
         body: JSON.stringify(body),
       });
@@ -240,12 +243,17 @@ export function CreateInvoiceDialog({
                   />
                 </SelectTrigger>
                 <SelectContent position="popper" sideOffset={4} className="z-[100]">
-                  {tokens.map((tk) => (
-                    <SelectItem key={tk.symbol} value={tk.symbol}>
-                      {tk.symbol}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                {nativeSymbol && (
+                  <SelectItem key={nativeSymbol} value={nativeSymbol}>
+                    {nativeSymbol} (Native)
+                  </SelectItem>
+                )}
+                {tokens.map((tk) => (
+                  <SelectItem key={tk.symbol} value={tk.symbol}>
+                    {tk.symbol}
+                  </SelectItem>
+                ))}
+              </SelectContent>
               </Select>
             )}
           </div>

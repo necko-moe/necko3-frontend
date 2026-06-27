@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { formatDistanceToNow } from "date-fns";
 import { useDateLocale } from "@/lib/date-locale";
@@ -20,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Copy, Check, FileText } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 
 interface PaymentTableProps {
   payments: PaymentSchema[];
@@ -31,9 +30,11 @@ const statusConfig: Record<
   string,
   { dot: string; badge: "default" | "secondary" | "destructive" | "outline" }
 > = {
+  Pending: { dot: "bg-zinc-400 dark:bg-zinc-500", badge: "secondary" },
   Confirming: { dot: "bg-amber-400", badge: "outline" },
   Confirmed: { dot: "bg-emerald-500", badge: "default" },
-  Cancelled: { dot: "bg-destructive/60", badge: "destructive" },
+  Lost: { dot: "bg-rose-400 dark:bg-rose-500", badge: "outline" },
+  Failed: { dot: "bg-destructive", badge: "destructive" },
 };
 
 function CopyButton({ value, label }: { value: string; label: string }) {
@@ -106,7 +107,6 @@ function TruncatedMono({
 
 export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   return (
     <Table>
@@ -114,7 +114,6 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
         <TableRow>
           <TableHead className="w-[110px]">{t("payments.table.status")}</TableHead>
           <TableHead>{t("payments.table.id")}</TableHead>
-          <TableHead>{t("payments.table.invoice")}</TableHead>
           <TableHead>{t("payments.table.fromTo")}</TableHead>
           <TableHead>{t("payments.table.token")}</TableHead>
           <TableHead>{t("payments.table.network")}</TableHead>
@@ -127,7 +126,7 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
         {payments.length === 0 ? (
           <TableRow>
             <TableCell
-              colSpan={9}
+              colSpan={8}
               className="py-16 text-center text-sm text-muted-foreground"
             >
               {t("payments.noPaymentsFound")}
@@ -157,30 +156,6 @@ export function PaymentTable({ payments, onSelect }: PaymentTableProps) {
 
                 <TableCell>
                   <TruncatedMono value={p.id} />
-                </TableCell>
-
-                <TableCell>
-                  <div
-                    className="flex items-center gap-1"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <TruncatedMono value={p.invoice_id} />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-6"
-                          onClick={() =>
-                            navigate(`/invoices?id=${p.invoice_id}`)
-                          }
-                        >
-                          <FileText className="size-3" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>{t("payments.table.openInvoice")}</TooltipContent>
-                    </Tooltip>
-                  </div>
                 </TableCell>
 
                 <TableCell>

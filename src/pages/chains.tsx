@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { ChainConfigSchema } from "@/types/chain";
+import type { ChainConfigSchema, ChainDataSchema } from "@/types/chain";
 import { useAuth } from "@/context/auth-context";
 import { apiFetch } from "@/lib/api";
 import { ErrorBlock } from "@/components/error-block";
@@ -17,7 +17,7 @@ export function ChainsPage() {
   const { apiKey } = useAuth();
   const { t } = useTranslation();
 
-  const [chains, setChains] = useState<ChainConfigSchema[]>([]);
+  const [chains, setChains] = useState<ChainDataSchema[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const everLoaded = useRef(false);
@@ -31,7 +31,7 @@ export function ChainsPage() {
     if (!apiKey) return;
     setLoading(true);
     try {
-      const res = await apiFetch<ChainConfigSchema[]>("/chain", apiKey);
+      const res = await apiFetch<{ items: ChainDataSchema[] }>("/v1/chains", apiKey);
       if (res.status === "error") {
         const msg = res.message ?? t("chains.failedToLoad");
         if (everLoaded.current) {
@@ -40,7 +40,7 @@ export function ChainsPage() {
           setError(msg);
         }
       } else if (res.data) {
-        setChains(res.data);
+        setChains(res.data.items || []);
         setError(null);
         everLoaded.current = true;
       }
@@ -81,7 +81,7 @@ export function ChainsPage() {
     if (!apiKey) return;
     setAdding(true);
     try {
-      const res = await apiFetch<never>("/chain", apiKey, {
+      const res = await apiFetch<never>("/v1/chains", apiKey, {
         method: "POST",
         body: JSON.stringify(chain),
       });
@@ -98,7 +98,7 @@ export function ChainsPage() {
     }
   }
 
-  function handleChainUpdated(updated: ChainConfigSchema) {
+  function handleChainUpdated(updated: ChainDataSchema) {
     setChains((prev) =>
       prev.map((c) => (c.name === updated.name ? updated : c)),
     );

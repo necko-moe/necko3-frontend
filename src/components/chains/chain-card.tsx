@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
-import type { ChainConfigSchema } from "@/types/chain";
+import type { ChainConfigSchema, ChainDataSchema } from "@/types/chain";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface ChainCardProps {
-  chain: ChainConfigSchema;
+  chain: ChainConfigSchema | ChainDataSchema;
   onClick: () => void;
 }
 

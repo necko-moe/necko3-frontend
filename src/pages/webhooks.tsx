@@ -32,15 +32,15 @@ const PAGE_SIZE = 20;
 const STATUSES: WebhookStatus[] = [
   "Pending",
   "Processing",
-  "Sent",
+  "Delivered",
   "Failed",
-  "Cancelled",
 ];
 const EVENT_TYPES: WebhookEventType[] = [
   "tx_detected",
   "tx_confirmed",
   "invoice_paid",
   "invoice_expired",
+  "invoice_cancelled",
 ];
 
 export function WebhooksPage() {
@@ -101,7 +101,7 @@ export function WebhooksPage() {
 
     try {
       const res = await apiFetch<PaginatedResponse<WebhookSchema>>(
-        `/webhook?${params.toString()}`,
+        `/v1/webhooks?${params.toString()}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -131,7 +131,7 @@ export function WebhooksPage() {
     }
     try {
       const res = await apiFetch<WebhookSchema>(
-        `/webhook/${encodeURIComponent(selectedId)}`,
+        `/v1/webhooks/${encodeURIComponent(selectedId)}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -179,11 +179,6 @@ export function WebhooksPage() {
     });
   }
 
-  function handleCancelled() {
-    handleBack();
-    fetchWebhooks();
-  }
-
   if (selectedId && detailError) {
     return (
       <div className="mx-auto max-w-6xl space-y-4">
@@ -204,7 +199,6 @@ export function WebhooksPage() {
         <WebhookDetail
           webhook={selectedWebhook}
           onBack={handleBack}
-          onCancelled={handleCancelled}
         />
       </div>
     );

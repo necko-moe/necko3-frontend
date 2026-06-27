@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import type { ChainConfigSchema } from "@/types/chain";
+import type { ChainDataSchema } from "@/types/chain";
 import type { PaymentSchema, PaymentStatus } from "@/types/payment";
 import type { PaginatedResponse } from "@/types/invoice";
 import { useAuth } from "@/context/auth-context";
@@ -34,7 +34,7 @@ import { PaymentDetail } from "@/components/payments/payment-detail";
 import { EmptyState } from "@/components/shared/empty-state";
 
 const PAGE_SIZE = 20;
-const STATUSES: PaymentStatus[] = ["Confirming", "Confirmed", "Cancelled"];
+const STATUSES: PaymentStatus[] = ["Pending", "Confirming", "Confirmed", "Lost", "Failed"];
 
 export function PaymentsPage() {
   const { apiKey } = useAuth();
@@ -45,7 +45,6 @@ export function PaymentsPage() {
   const statusFilter = searchParams.get("status") ?? "";
   const networkFilter = searchParams.get("network") ?? "";
   const tokenFilter = searchParams.get("token") ?? "";
-  const invoiceIdFilter = searchParams.get("invoice_id") ?? "";
   const fromFilter = searchParams.get("from") ?? "";
   const toFilter = searchParams.get("to") ?? "";
   const blockFilter = searchParams.get("block_number") ?? "";
@@ -54,7 +53,7 @@ export function PaymentsPage() {
   const [payments, setPayments] = useState<PaymentSchema[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [chains, setChains] = useState<ChainConfigSchema[]>([]);
+  const [chains, setChains] = useState<ChainDataSchema[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const [selectedPayment, setSelectedPayment] = useState<PaymentSchema | null>(
@@ -92,7 +91,6 @@ export function PaymentsPage() {
     statusFilter ||
     networkFilter ||
     tokenFilter ||
-    invoiceIdFilter ||
     fromFilter ||
     toFilter ||
     blockFilter;
@@ -101,8 +99,8 @@ export function PaymentsPage() {
 
   const fetchChains = useCallback(async () => {
     if (!apiKey) return;
-    const res = await apiFetchSilent<ChainConfigSchema[]>("/chain", apiKey);
-    if (res?.status === "success" && res.data) setChains(res.data);
+    const res = await apiFetchSilent<{ items: ChainDataSchema[] }>("/v1/chains", apiKey);
+    if (res?.status === "success" && res.data) setChains(res.data.items || []);
   }, [apiKey]);
 
   useEffect(() => {
@@ -124,14 +122,13 @@ export function PaymentsPage() {
     if (statusFilter) params.set("status", statusFilter);
     if (networkFilter) params.set("network", networkFilter);
     if (tokenFilter) params.set("token", tokenFilter);
-    if (invoiceIdFilter) params.set("invoice_id", invoiceIdFilter);
     if (fromFilter) params.set("from", fromFilter);
     if (toFilter) params.set("to", toFilter);
     if (blockFilter) params.set("block_number", blockFilter);
 
     try {
       const res = await apiFetch<PaginatedResponse<PaymentSchema>>(
-        `/payment?${params.toString()}`,
+        `/v1/payments?${params.toString()}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -153,7 +150,6 @@ export function PaymentsPage() {
     statusFilter,
     networkFilter,
     tokenFilter,
-    invoiceIdFilter,
     fromFilter,
     toFilter,
     blockFilter,
@@ -171,7 +167,7 @@ export function PaymentsPage() {
     }
     try {
       const res = await apiFetch<PaymentSchema>(
-        `/payment/${encodeURIComponent(selectedId)}`,
+        `/v1/payments/${encodeURIComponent(selectedId)}`,
         apiKey,
       );
       if (res.status === "error") {
@@ -219,11 +215,6 @@ export function PaymentsPage() {
     });
   }
 
-  function handleCancelled() {
-    handleBack();
-    fetchPayments();
-  }
-
   if (selectedId && detailError) {
     return (
       <div className="mx-auto max-w-6xl space-y-4">
@@ -244,7 +235,6 @@ export function PaymentsPage() {
         <PaymentDetail
           payment={selectedPayment}
           onBack={handleBack}
-          onCancelled={handleCancelled}
         />
       </div>
     );
@@ -271,13 +261,6 @@ export function PaymentsPage() {
 
       {/* Primary filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <Input
-          placeholder={t("payments.invoiceId")}
-          value={invoiceIdFilter}
-          onChange={(e) => setParam("invoice_id", e.target.value)}
-          className="w-48"
-        />
-
         <Select
           value={networkFilter || "__all__"}
           onValueChange={(v) => setParam("network", v === "__all__" ? "" : v)}

@@ -4,7 +4,8 @@
     "chains": "链管理",
     "invoices": "账单",
     "payments": "付款",
-    "webhooks": "Webhook"
+    "webhooks": "Webhook",
+    "apiKeys": "API 密钥"
   },
   "sidebar": {
     "collapseSidebar": "收起侧边栏",
@@ -57,7 +58,9 @@
     "Confirmed": "已确认",
     "Processing": "处理中",
     "Sent": "已发送",
-    "Failed": "失败"
+    "Failed": "失败",
+    "Delivered": "已送达",
+    "Lost": "已丢失"
   },
   "languages": {
     "en": "English",
@@ -119,7 +122,8 @@
       "startBlock": "起始区块",
       "logoUrl": "Logo URL",
       "active": "启用",
-      "addUrl": "添加 URL"
+      "addUrl": "添加 URL",
+      "safeLag": "安全区块延迟"
     },
     "addTokenDialog": {
       "title": "向 {{name}} 添加代币",
@@ -137,6 +141,7 @@
       "nativeSymbolTooltip": "此链的原生代币符号（例如 ETH、POL）。创建时设定。",
       "decimals": "精度",
       "decimalsTooltip": "原生代币的小数位数。创建时设定。",
+      "nameTooltip": "此链的唯一内部名称（例如 Polygon、Ethereum）。用作 API 路由的标识符。",
       "xpub": "xpub",
       "xpubTooltip": "扩展公钥，用于为每张账单派生唯一的收款地址。",
       "rpcUrls": "RPC 节点",
@@ -149,7 +154,9 @@
       "lastProcessedBlockTooltip": "扫描器已处理的最后一个区块号。设为 0 将从区块链的最新区块开始。",
       "logoUrl": "Logo URL",
       "logoUrlTooltip": "链的 Logo 图片 URL。显示在管理面板中。",
-      "addNewRpcUrl": "添加新的 RPC 节点..."
+      "addNewRpcUrl": "添加新的 RPC 节点...",
+      "safeLag": "安全区块延迟",
+      "safeLagTooltip": "信任 RPC 空日志响应所需的最小区块深度（防止虚假空日志）。"
     },
     "tokenList": {
       "searchPlaceholder": "搜索代币...",
@@ -159,6 +166,12 @@
       "deleteToken": "删除代币",
       "deleteTitle": "删除代币 {{symbol}}？",
       "deleteDesc": "这将从此链上永久删除代币「{{symbol}}」。此操作无法撤销。"
+    },
+    "watchAddresses": "监视地址",
+    "watchAddressList": {
+      "emptyState": "尚未添加任何监视地址。",
+      "viewInvoices": "查看账单",
+      "viewPayments": "查看付款"
     }
   },
   "invoices": {
@@ -294,6 +307,7 @@
       "token": "代币",
       "transaction": "交易",
       "txHash": "交易哈希",
+      "blockHash": "区块哈希",
       "blockNumber": "区块号",
       "logIndex": "日志索引",
       "created": "创建时间",
@@ -319,13 +333,15 @@
       "tx_detected": "检测到交易",
       "tx_confirmed": "交易已确认",
       "invoice_paid": "账单已支付",
-      "invoice_expired": "账单已过期"
+      "invoice_expired": "账单已过期",
+      "invoice_cancelled": "账单已取消"
     },
     "eventFull": {
       "tx_detected": "检测到交易",
       "tx_confirmed": "交易已确认",
       "invoice_paid": "账单已支付",
-      "invoice_expired": "账单已过期"
+      "invoice_expired": "账单已过期",
+      "invoice_cancelled": "账单已取消"
     },
     "table": {
       "status": "状态",
@@ -340,17 +356,64 @@
     "detail": {
       "title": "Webhook",
       "viewInvoice": "查看账单",
-      "cancelWebhook": "取消 Webhook",
       "webhookId": "Webhook ID",
       "invoiceId": "账单 ID",
       "url": "URL",
       "attempts": "尝试次数",
       "nextRetry": "下次重试",
       "created": "创建时间",
-      "eventPayload": "事件数据",
-      "cancelTitle": "取消此 Webhook？",
-      "cancelDesc": "这将永久取消此 Webhook 的发送。将不再进行任何重试。此操作无法撤销。",
-      "failedToCancel": "取消 Webhook 失败"
+      "eventPayload": "事件数据"
+    }
+  },
+  "apiKeys": {
+    "title": "API 密钥",
+    "subtitle": "管理您集成的 API 密钥。",
+    "searchPlaceholder": "搜索 API 密钥...",
+    "add": "添加 API 密钥",
+    "emptyTitle": "尚未配置 API 密钥",
+    "emptyDescription": "创建您的第一个 API 密钥以开始使用。",
+    "noResults": "没有匹配的 API 密钥。",
+    "failedToLoad": "无法加载 API 密钥",
+    "failedToAdd": "创建 API 密钥失败",
+    "failedToRevoke": "吊销 API 密钥失败",
+    "active": "已启用",
+    "revoked": "已吊销",
+    "addDialog": {
+      "title": "创建 API 密钥",
+      "description": "创建一个新的 API 密钥。您只会看到一次密钥。",
+      "name": "名称 *",
+      "namePlaceholder": "我的 API 密钥",
+      "prefix": "密钥类型 *",
+      "permissions": "权限 *",
+      "permissionsRequired": "请至少选择一个权限"
+    },
+    "createdDialog": {
+      "title": "API 密钥已创建",
+      "description": "请将此密钥安全保存。您将无法再次看到它！",
+      "warning": "重要",
+      "apiKey": "您的 API 密钥",
+      "done": "完成"
+    },
+    "detail": {
+      "title": "API 密钥",
+      "name": "名称",
+      "prefix": "密钥类型",
+      "id": "密钥 ID",
+      "permissions": "权限",
+      "created": "创建时间",
+      "revoke": "吊销密钥",
+      "revokeTitle": "吊销此 API 密钥？",
+      "revokeDesc": "此 API 密钥将被永久吊销。它将不再可用于身份验证。此操作无法撤销。"
+    },
+    "permission": {
+      "FullAccess": "完全访问",
+      "WriteInvoices": "写入账单",
+      "ReadInvoices": "读取账单",
+      "PublicRead": "公共读取",
+      "full_access": "完全访问",
+      "write_invoices": "写入账单",
+      "read_invoices": "读取账单",
+      "public_read": "公共读取"
     }
   }
 }

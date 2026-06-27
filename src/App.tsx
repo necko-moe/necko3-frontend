@@ -12,6 +12,7 @@ import { ChainsPage } from "@/pages/chains";
 import { InvoicesPage } from "@/pages/invoices";
 import { PaymentsPage } from "@/pages/payments";
 import { WebhooksPage } from "@/pages/webhooks";
+import { ApiKeysPage } from "@/pages/api-keys";
 
 export function App() {
   const { i18n } = useTranslation();
@@ -44,6 +45,7 @@ export function App() {
                 <Route path="/invoices" element={<InvoicesPage />} />
                 <Route path="/payments" element={<PaymentsPage />} />
                 <Route path="/webhooks" element={<WebhooksPage />} />
+                <Route path="/api-keys" element={<ApiKeysPage />} />
                 <Route path="*" element={<Navigate to="/getting-started" replace />} />
               </Route>
             </Routes>

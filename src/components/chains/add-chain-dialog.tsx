@@ -13,7 +13,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Plus, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Info, Plus, X } from "lucide-react";
 
 interface AddChainDialogProps {
   open: boolean;
@@ -34,7 +39,25 @@ const EMPTY: ChainConfigSchema = {
   block_lag: 5,
   required_confirmations: 40,
   logo_url: null,
+  safe_lag: 0,
+  tokens: [],
 };
+
+function FieldLabel({ label, tooltip }: { label: string; tooltip: string }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label>{label}</Label>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button type="button" className="text-muted-foreground/60 hover:text-muted-foreground">
+            <Info className="size-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="right" className="max-w-56">{tooltip}</TooltipContent>
+      </Tooltip>
+    </div>
+  );
+}
 
 export function AddChainDialog({
   open,
@@ -93,7 +116,10 @@ export function AddChainDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.name")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.name")}
+                tooltip={t("chains.fields.nameTooltip")}
+              />
               <Input
                 required
                 value={form.name}
@@ -102,14 +128,20 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.chainType")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.chainType")}
+                tooltip={t("chains.fields.chainTypeTooltip")}
+              />
               <Input value={form.chain_type} disabled />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.nativeSymbol")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.nativeSymbol")}
+                tooltip={t("chains.fields.nativeSymbolTooltip")}
+              />
               <Input
                 required
                 value={form.native_symbol}
@@ -118,7 +150,10 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.decimals")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.decimals")}
+                tooltip={t("chains.fields.decimalsTooltip")}
+              />
               <Input
                 required
                 type="number"
@@ -130,7 +165,10 @@ export function AddChainDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("chains.addDialog.xpub")}</Label>
+            <FieldLabel
+              label={t("chains.addDialog.xpub")}
+              tooltip={t("chains.fields.xpubTooltip")}
+            />
             <Input
               required
               value={form.xpub}
@@ -141,7 +179,10 @@ export function AddChainDialog({
           </div>
 
           <div className="space-y-2">
-            <Label>{t("chains.addDialog.rpcUrls")}</Label>
+            <FieldLabel
+              label={t("chains.addDialog.rpcUrls")}
+              tooltip={t("chains.fields.rpcUrlsTooltip")}
+            />
             {form.rpc_urls.map((url, i) => (
               <div key={i} className="flex items-center gap-1.5">
                 <Input
@@ -174,9 +215,12 @@ export function AddChainDialog({
             </Button>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.blockLag")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.blockLag")}
+                tooltip={t("chains.fields.blockLagTooltip")}
+              />
               <Input
                 type="number"
                 min={0}
@@ -185,7 +229,10 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.confirmations")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.confirmations")}
+                tooltip={t("chains.fields.requiredConfirmationsTooltip")}
+              />
               <Input
                 type="number"
                 min={0}
@@ -194,7 +241,10 @@ export function AddChainDialog({
               />
             </div>
             <div className="space-y-1.5">
-              <Label>{t("chains.addDialog.startBlock")}</Label>
+              <FieldLabel
+                label={t("chains.addDialog.startBlock")}
+                tooltip={t("chains.fields.lastProcessedBlockTooltip")}
+              />
               <Input
                 type="number"
                 min={0}
@@ -202,10 +252,25 @@ export function AddChainDialog({
                 onChange={(e) => setForm({ ...form, last_processed_block: Number(e.target.value) })}
               />
             </div>
+            <div className="space-y-1.5">
+              <FieldLabel
+                label={t("chains.addDialog.safeLag")}
+                tooltip={t("chains.fields.safeLagTooltip")}
+              />
+              <Input
+                type="number"
+                min={0}
+                value={form.safe_lag}
+                onChange={(e) => setForm({ ...form, safe_lag: Number(e.target.value) })}
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label>{t("chains.addDialog.logoUrl")}</Label>
+            <FieldLabel
+              label={t("chains.addDialog.logoUrl")}
+              tooltip={t("chains.fields.logoUrlTooltip")}
+            />
             <Input
               value={form.logo_url ?? ""}
               onChange={(e) => setForm({ ...form, logo_url: e.target.value || null })}

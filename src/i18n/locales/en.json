@@ -4,7 +4,8 @@
     "chains": "Chains",
     "invoices": "Invoices",
     "payments": "Payments",
-    "webhooks": "Webhooks"
+    "webhooks": "Webhooks",
+    "apiKeys": "API Keys"
   },
   "sidebar": {
     "collapseSidebar": "Collapse sidebar",
@@ -57,7 +58,9 @@
     "Confirmed": "Confirmed",
     "Processing": "Processing",
     "Sent": "Sent",
-    "Failed": "Failed"
+    "Failed": "Failed",
+    "Delivered": "Delivered",
+    "Lost": "Lost"
   },
   "languages": {
     "en": "English",
@@ -119,7 +122,8 @@
       "startBlock": "Start Block",
       "logoUrl": "Logo URL",
       "active": "Active",
-      "addUrl": "Add URL"
+      "addUrl": "Add URL",
+      "safeLag": "Safe Lag"
     },
     "addTokenDialog": {
       "title": "Add Token to {{name}}",
@@ -137,6 +141,7 @@
       "nativeSymbolTooltip": "The native coin ticker of this chain (e.g. ETH, POL). Set at creation time.",
       "decimals": "Decimals",
       "decimalsTooltip": "Number of decimal places for the native coin. Set at creation time.",
+      "nameTooltip": "A unique internal name for this chain (e.g. Polygon, Ethereum). Used as the identifier in API routes.",
       "xpub": "xpub",
       "xpubTooltip": "Extended public key used to derive unique deposit addresses for each invoice.",
       "rpcUrls": "RPC URLs",
@@ -149,7 +154,9 @@
       "lastProcessedBlockTooltip": "The last block number processed by the scanner. Set to 0 to start from the latest block in the blockchain.",
       "logoUrl": "Logo URL",
       "logoUrlTooltip": "URL to the chain's logo image. Displayed in the admin panel.",
-      "addNewRpcUrl": "Add new RPC URL..."
+      "addNewRpcUrl": "Add new RPC URL...",
+      "safeLag": "Safe Lag",
+      "safeLagTooltip": "Minimum block depth required to trust empty log responses from RPC (prevents false-empty logs)."
     },
     "tokenList": {
       "searchPlaceholder": "Search tokens...",
@@ -159,6 +166,12 @@
       "deleteToken": "Delete token",
       "deleteTitle": "Delete token {{symbol}}?",
       "deleteDesc": "This will permanently remove the token \"{{symbol}}\" from this chain. This action cannot be undone."
+    },
+    "watchAddresses": "Watch Addresses",
+    "watchAddressList": {
+      "emptyState": "No watched addresses yet.",
+      "viewInvoices": "View Invoices",
+      "viewPayments": "View Payments"
     }
   },
   "invoices": {
@@ -296,6 +309,7 @@
       "token": "Token",
       "transaction": "Transaction",
       "txHash": "Tx Hash",
+      "blockHash": "Block Hash",
       "blockNumber": "Block Number",
       "logIndex": "Log Index",
       "created": "Created",
@@ -322,13 +336,15 @@
       "tx_detected": "Tx Detected",
       "tx_confirmed": "Tx Confirmed",
       "invoice_paid": "Invoice Paid",
-      "invoice_expired": "Invoice Expired"
+      "invoice_expired": "Invoice Expired",
+      "invoice_cancelled": "Invoice Cancelled"
     },
     "eventFull": {
       "tx_detected": "Transaction Detected",
       "tx_confirmed": "Transaction Confirmed",
       "invoice_paid": "Invoice Paid",
-      "invoice_expired": "Invoice Expired"
+      "invoice_expired": "Invoice Expired",
+      "invoice_cancelled": "Invoice Cancelled"
     },
     "table": {
       "status": "Status",
@@ -343,17 +359,64 @@
     "detail": {
       "title": "Webhook",
       "viewInvoice": "View Invoice",
-      "cancelWebhook": "Cancel Webhook",
       "webhookId": "Webhook ID",
       "invoiceId": "Invoice ID",
       "url": "URL",
       "attempts": "Attempts",
       "nextRetry": "Next Retry",
       "created": "Created",
-      "eventPayload": "Event Payload",
-      "cancelTitle": "Cancel this webhook?",
-      "cancelDesc": "This will permanently cancel the webhook delivery. No further retry attempts will be made. This action cannot be undone.",
-      "failedToCancel": "Failed to cancel webhook"
+      "eventPayload": "Event Payload"
+    }
+  },
+  "apiKeys": {
+    "title": "API Keys",
+    "subtitle": "Manage API keys for your integration.",
+    "searchPlaceholder": "Search API keys...",
+    "add": "Add API Key",
+    "emptyTitle": "No API keys configured",
+    "emptyDescription": "Create your first API key to get started.",
+    "noResults": "No API keys match your search.",
+    "failedToLoad": "Could not load API keys",
+    "failedToAdd": "Failed to create API key",
+    "failedToRevoke": "Failed to revoke API key",
+    "active": "Active",
+    "revoked": "Revoked",
+    "addDialog": {
+      "title": "Create API Key",
+      "description": "Create a new API key. You will only see the secret once.",
+      "name": "Name *",
+      "namePlaceholder": "My API Key",
+      "prefix": "Key Type *",
+      "permissions": "Permissions *",
+      "permissionsRequired": "Please select at least one permission"
+    },
+    "createdDialog": {
+      "title": "API Key Created",
+      "description": "Save this key somewhere safe. You won't be able to see it again!",
+      "warning": "Important",
+      "apiKey": "Your API Key",
+      "done": "Done"
+    },
+    "detail": {
+      "title": "API Key",
+      "name": "Name",
+      "prefix": "Key Type",
+      "id": "Key ID",
+      "permissions": "Permissions",
+      "created": "Created",
+      "revoke": "Revoke Key",
+      "revokeTitle": "Revoke this API key?",
+      "revokeDesc": "This will permanently revoke the API key. It will no longer work for authentication. This action cannot be undone."
+    },
+    "permission": {
+      "FullAccess": "Full Access",
+      "WriteInvoices": "Write Invoices",
+      "ReadInvoices": "Read Invoices",
+      "PublicRead": "Public Read",
+      "full_access": "Full Access",
+      "write_invoices": "Write Invoices",
+      "read_invoices": "Read Invoices",
+      "public_read": "Public Read"
     }
   }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { ChainConfigSchema, PartialChainUpdateSchema } from "@/types/chain";
+import type { ChainConfigSchema, ChainDataSchema, PartialChainUpdateSchema } from "@/types/chain";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 interface ChainInfoFieldsProps {
-  chain: ChainConfigSchema;
+  chain: ChainConfigSchema | ChainDataSchema;
   draft: PartialChainUpdateSchema;
   onChange: (patch: PartialChainUpdateSchema) => void;
 }
@@ -72,6 +72,7 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
   const blockLag = draft.block_lag ?? chain.block_lag;
   const requiredConfirmations = draft.required_confirmations ?? chain.required_confirmations;
   const lastProcessedBlock = draft.last_processed_block ?? chain.last_processed_block;
+  const safeLag = draft.safe_lag ?? chain.safe_lag;
   const logoUrl = draft.logo_url !== undefined ? (draft.logo_url ?? "") : (chain.logo_url ?? "");
 
   function handleRpcRemove(index: number) {
@@ -189,6 +190,15 @@ export function ChainInfoFields({ chain, draft, onChange }: ChainInfoFieldsProps
           min={0}
           value={lastProcessedBlock}
           onChange={(e) => onChange({ ...draft, last_processed_block: Number(e.target.value) })}
+        />
+      </FieldRow>
+
+      <FieldRow icon={ShieldCheck} label={t("chains.fields.safeLag")} tooltip={t("chains.fields.safeLagTooltip")}>
+        <Input
+          type="number"
+          min={0}
+          value={safeLag}
+          onChange={(e) => onChange({ ...draft, safe_lag: Number(e.target.value) })}
         />
       </FieldRow>
 

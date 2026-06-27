@@ -16,6 +16,8 @@ interface ConfirmDeleteDialogProps {
   description: string;
   onConfirm: () => void;
   loading?: boolean;
+  confirmText?: string;
+  cancelText?: string;
 }
 
 export function ConfirmDeleteDialog({
@@ -25,6 +27,8 @@ export function ConfirmDeleteDialog({
   description,
   onConfirm,
   loading,
+  confirmText,
+  cancelText,
 }: ConfirmDeleteDialogProps) {
   const { t } = useTranslation();
 
@@ -41,14 +45,14 @@ export function ConfirmDeleteDialog({
             onClick={() => onOpenChange(false)}
             disabled={loading}
           >
-            {t("common.cancel")}
+            {cancelText || t("common.cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={onConfirm}
             disabled={loading}
           >
-            {loading ? t("common.deleting") : t("common.delete")}
+            {loading ? t("common.deleting") : (confirmText || t("common.delete"))}
           </Button>
         </DialogFooter>
       </DialogContent>

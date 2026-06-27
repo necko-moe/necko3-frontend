@@ -1,0 +1,4617 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "necko3",
+    "description": "",
+    "license": { "name": "" },
+    "version": "0.2.1"
+  },
+  "paths": {
+    "/v1/api-keys": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "List all API keys",
+        "description": "Retrieves a list of all generated API keys (metadata only, secrets are never returned).\n\n**Requires Permission:** `full_access`",
+        "operationId": "list_api_keys",
+        "responses": {
+          "200": {
+            "description": "List of API keys retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VecResponseSchema_ApiKeyRecordSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "post": {
+        "tags": ["auth"],
+        "summary": "Create a new API key",
+        "description": "Generates a new API key (publishable or secret) with specific permissions.\n\n**Requires Permission:** `full_access`",
+        "operationId": "create_key",
+        "requestBody": {
+          "description": "Details for the new API key. Note that `pk_live` keys are strictly limited to `public_read` permission.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateKeyReqSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "API key created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CreateKeyResSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/api-keys/{id}": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Get API key details",
+        "description": "Retrieves metadata for a specific API key by its UUID.\n\n**Requires Permission:** `full_access`",
+        "operationId": "get_key_record",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the API key record",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key metadata retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiKeyRecordSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/api-keys/{id}/revoke": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Revoke an API key",
+        "description": "Deactivates an API key immediately, preventing any further requests using it. This action cannot be easily reversed via the API.\n\n**Requires Permission:** `full_access`",
+        "operationId": "revoke_key",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the API key to revoke",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "API key successfully revoked",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/RevokeKeyResSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/chains": {
+      "get": {
+        "tags": ["chains"],
+        "summary": "List all blockchain networks",
+        "description": "Retrieves a list of all configured blockchain networks, both active and inactive.\n\n**Requires Permission:** *Any valid API key*",
+        "operationId": "list_chains",
+        "responses": {
+          "200": {
+            "description": "List of blockchain networks retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VecResponseSchema_ChainDataSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "post": {
+        "tags": ["chains"],
+        "summary": "Add a new blockchain network",
+        "description": "Registers a new blockchain network configuration in the system.\n\n**Requires Permission:** `full_access`",
+        "operationId": "add_chain",
+        "requestBody": {
+          "description": "Configuration details required to initialize the new chain.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ChainConfigSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Chain successfully registered",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/chains/{name}": {
+      "get": {
+        "tags": ["chains"],
+        "summary": "Get a specific network",
+        "description": "Retrieves detailed configuration and state information for a specific blockchain network by its name.\n\n**Requires Permission:** *Any valid API key*",
+        "operationId": "get_chain",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The unique name of the network (e.g., 'ethereum', 'polygon')",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "delete": {
+        "tags": ["chains"],
+        "summary": "Delete a network",
+        "description": "Permanently removes a blockchain network configuration from the system.\n\n**Requires Permission:** `full_access`\n\n**Warning:** This operation might be irreversible and could affect associated tokens and historical data depending on database constraints.",
+        "operationId": "delete_chain",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The unique name of the network to delete",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Network deleted successfully. Returns the last known state of the deleted chain.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "patch": {
+        "tags": ["chains"],
+        "summary": "Update network configuration",
+        "description": "Partially updates the configuration of an existing blockchain network.\n\n**Requires Permission:** `full_access`",
+        "operationId": "update_chain",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The unique name of the network to update",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "description": "Object containing the fields to update. Any omitted fields will remain unchanged.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartialChainUpdateSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Network configuration updated successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChainDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/chains/{name}/tokens": {
+      "get": {
+        "tags": ["chains"],
+        "summary": "List all tokens for a network",
+        "description": "Retrieves a list of all supported tokens registered under a specific blockchain network.\n\n**Requires Permission:** *Any valid API key*",
+        "operationId": "list_tokens",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The canonical name of the network",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tokens retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VecResponseSchema_TokenDataSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "post": {
+        "tags": ["chains"],
+        "summary": "Add a new token to a network",
+        "description": "Registers a new token (e.g., ERC20) to an existing blockchain network.\n\n**Requires Permission:** `full_access`",
+        "operationId": "add_token",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The canonical name of the network (e.g., 'ethereum')",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "description": "Configuration details for the new token.",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TokenConfigSchema" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Token successfully registered",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/chains/{name}/tokens/{sym}": {
+      "get": {
+        "tags": ["chains"],
+        "summary": "Get specific token details",
+        "description": "Retrieves detailed configuration and state information for a specific token on a given network.\n\n**Requires Permission:** *Any valid API key*",
+        "operationId": "get_token",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The canonical name of the network",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sym",
+            "in": "path",
+            "description": "The ticker symbol of the token (e.g., 'USDT')",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "delete": {
+        "tags": ["chains"],
+        "summary": "Delete a token",
+        "description": "Permanently removes a token configuration from the specified network.\n\n**Requires Permission:** `full_access`",
+        "operationId": "delete_token",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The canonical name of the network",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "sym",
+            "in": "path",
+            "description": "The ticker symbol of the token to delete",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Token deleted successfully. Returns the last known state of the token.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TokenDataSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/checkout/invoice/{id}": {
+      "get": {
+        "tags": ["checkout"],
+        "summary": "Get public invoice details",
+        "description": "Retrieves public, safe-to-display details of an invoice for the checkout page.\n\n**Requires Permission:** `public_read`",
+        "operationId": "get_checkout_invoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the invoice",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public invoice details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicInvoiceModelSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/checkout/invoice/{id}/payments": {
+      "get": {
+        "tags": ["checkout"],
+        "summary": "List payments for an invoice",
+        "description": "Retrieves a paginated list of all payments (pending, confirming, and confirmed) directed to a specific invoice's address.\n\n**Requires Permission:** `public_read`",
+        "operationId": "get_checkout_invoice_payments",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the invoice",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items to return per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to retrieve (1-indexed).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVecPageSchema_PublicPaymentModelSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/checkout/invoice/{id}/ws": {
+      "get": {
+        "tags": ["checkout"],
+        "summary": "Subscribe to invoice updates (WebSocket)",
+        "description": "Establishes a WebSocket connection to receive real-time updates about the specified invoice's status and incoming payments.\n\n**Requires Permission:** `public_read`",
+        "operationId": "invoice_ws_handler",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the invoice",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "101": { "description": "WebSocket protocol successfully upgraded" },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/invoices": {
+      "get": {
+        "tags": ["invoices"],
+        "summary": "List all invoices",
+        "description": "Retrieves a paginated list of all created invoices. Can be filtered by status, network, address, or token.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "list_invoices",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by current invoice status.",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/InvoiceStatusSchema" }
+          },
+          {
+            "name": "address",
+            "in": "query",
+            "description": "Filter by the destination payment address.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "Filter by the target blockchain network.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Filter by the requested token.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items to return per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to retrieve (1-indexed).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of invoices retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVecPageSchema_InvoiceSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      },
+      "post": {
+        "tags": ["invoices"],
+        "summary": "Create a new invoice",
+        "description": "Generates a new payment invoice, allocating a unique address on the specified network for the customer to send funds to.\n\n**Requires Permission:** `write_invoices`",
+        "operationId": "create_invoice",
+        "requestBody": {
+          "description": "Invoice configuration including amount, network, asset, and optional webhooks.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInvoiceReqSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Invoice created successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/invoices/{id}": {
+      "get": {
+        "tags": ["invoices"],
+        "summary": "Get invoice details",
+        "description": "Retrieves complete internal details of a specific invoice.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "get_invoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the invoice",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/invoices/{id}/cancel": {
+      "post": {
+        "tags": ["invoices"],
+        "summary": "Cancel an invoice",
+        "description": "Manually marks a pending invoice as `Cancelled`. It will no longer accept payments or trigger success webhooks.\n\n**Requires Permission:** `write_invoices`",
+        "operationId": "cancel_invoice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the invoice to cancel",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice cancelled successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InvoiceSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/payments": {
+      "get": {
+        "tags": ["payments"],
+        "summary": "List all internal payments",
+        "description": "Retrieves a paginated list of all internal payment records processed by the system. Can be filtered by addresses, network, token, block details, or status.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "list_payments",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Filter by the sender's address.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Filter by the receiver's address.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "Filter by the target blockchain network.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Filter by the transferred token.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "block_number",
+            "in": "query",
+            "description": "Filter by a specific block number.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "minimum": 0 }
+          },
+          {
+            "name": "block_hash",
+            "in": "query",
+            "description": "Filter by a specific block hash.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by current payment status (e.g., Confirming, Confirmed).",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/PaymentStatusSchema" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items to return per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to retrieve (1-indexed).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of payments retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVecPageSchema_PaymentSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/payments/{id}": {
+      "get": {
+        "tags": ["payments"],
+        "summary": "Get payment details",
+        "description": "Retrieves detailed information about a specific payment transaction by its internal UUID.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "get_payment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the payment",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Payment details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaymentSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/proxy/image": {
+      "get": {
+        "tags": ["checkout"],
+        "summary": "Proxy and cache external images",
+        "description": "Proxies external image resources to bypass CORS restrictions (preventing canvas taints). Returns aggressive caching headers to minimize upstream requests.",
+        "operationId": "image_proxy",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "description": "The absolute HTTP(S) URL of the external image to be proxied.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The proxied image bytes.",
+            "content": { "image/png": {} }
+          },
+          "400": {
+            "description": "Failed to fetch the source image or server returned non-success status code."
+          },
+          "500": {
+            "description": "Failed to read or process image bytes on the proxy side."
+          }
+        }
+      }
+    },
+    "/v1/webhooks": {
+      "get": {
+        "tags": ["webhooks"],
+        "summary": "List webhook deliveries",
+        "description": "Retrieves a paginated list of webhook delivery logs. Useful for auditing and debugging failed event notifications.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "list_webhooks",
+        "parameters": [
+          {
+            "name": "invoice_id",
+            "in": "query",
+            "description": "Filter webhooks by the associated invoice ID.",
+            "required": false,
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "event_type",
+            "in": "query",
+            "description": "Filter by the type of event (e.g., 'tx_detected', 'invoice_paid').",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "url",
+            "in": "query",
+            "description": "Filter by the destination URL.",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by the current delivery status.",
+            "required": false,
+            "schema": { "$ref": "#/components/schemas/WebhookStatusSchema" }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Number of items to return per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number to retrieve (1-indexed).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "default": 1,
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of webhook logs retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedVecPageSchema_WebhookSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    },
+    "/v1/webhooks/{id}": {
+      "get": {
+        "tags": ["webhooks"],
+        "summary": "Get webhook delivery details",
+        "description": "Retrieves the full payload, status, and retry schedule of a specific webhook delivery event.\n\n**Requires Permission:** `read_invoices`",
+        "operationId": "get_webhook",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The unique identifier (UUID) of the webhook delivery log",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Webhook details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WebhookSchema" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "parameter_invalid",
+                    "message": "Invalid value 'zzz123' for parameter 'id': UUID parsing failed: invalid character: found `z` at 0",
+                    "param": "id",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or missing API key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "api_key_invalid",
+                    "message": "The provided API key is invalid.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - Insufficient permissions or API key disabled",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "permission_denied",
+                    "message": "You do not have the required permissions to access this resource.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "code": "resource_missing",
+                    "message": "Resource '123e4567-e89b-12d3-a456-426614174000' not found.",
+                    "type": "invalid_request_error"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseSchema"
+                },
+                "example": {
+                  "error": {
+                    "message": "An internal server error occurred.",
+                    "type": "api_error"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearer_auth": [] }]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiKeyPrefixSchema": {
+        "type": "string",
+        "title": "ApiKeyPrefix",
+        "enum": ["sk_live", "pk_live"]
+      },
+      "ApiKeyRecordSchema": {
+        "type": "object",
+        "title": "ApiKeyRecord",
+        "required": [
+          "id",
+          "name",
+          "prefix",
+          "permissions",
+          "is_active",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp indicating when the key was created.",
+            "example": "2026-06-26T15:00:00Z"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier (UUID) of the API key record.",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Indicates whether the key is currently active and can be used for authentication.",
+            "example": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable identifier for this key.",
+            "example": "Payment Gateway Key"
+          },
+          "permissions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PermissionSchema" },
+            "description": "List of permissions granted to this key.",
+            "example": ["write_invoices", "read_invoices"]
+          },
+          "prefix": {
+            "type": "string",
+            "description": "The environment prefix for the key.",
+            "example": "sk_live"
+          }
+        }
+      },
+      "ChainConfigSchema": {
+        "type": "object",
+        "title": "ChainConfig",
+        "required": [
+          "name",
+          "active",
+          "rpc_urls",
+          "chain_type",
+          "xpub",
+          "native_symbol",
+          "decimals",
+          "last_processed_block",
+          "block_lag",
+          "safe_lag",
+          "required_confirmations",
+          "tokens"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Indicates whether the network should be active immediately upon creation.",
+            "example": true
+          },
+          "block_lag": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Delay in blocks between the node and the tip.",
+            "example": 3,
+            "minimum": 0
+          },
+          "chain_type": { "$ref": "#/components/schemas/ChainTypeSchema" },
+          "decimals": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of decimal places for the native currency.",
+            "example": 18,
+            "minimum": 0
+          },
+          "last_processed_block": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The starting block number for the indexer. Use 0 to start from the current tip.",
+            "example": 0,
+            "minimum": 0
+          },
+          "logo_url": {
+            "type": ["string", "null"],
+            "description": "Optional URL pointing to the network's logo icon.",
+            "example": "https://cryptologos.cc/logos/arbitrum-arb-logo.png"
+          },
+          "name": {
+            "type": "string",
+            "description": "Unique canonical identifier for the new network.",
+            "example": "arbitrum"
+          },
+          "native_symbol": {
+            "type": "string",
+            "description": "The native currency symbol.",
+            "example": "ETH"
+          },
+          "required_confirmations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of blocks required to consider a transaction fully confirmed.",
+            "example": 5,
+            "minimum": 0
+          },
+          "rpc_urls": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of RPC endpoint URLs used to interact with the network.",
+            "example": ["https://arb1.arbitrum.io/rpc"]
+          },
+          "safe_lag": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Minimum block depth required to trust empty log responses from RPC (prevents false-empty logs)",
+            "example": 15,
+            "minimum": 0
+          },
+          "tokens": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TokenConfigSchema" },
+            "description": "Initial list of tokens (e.g., ERC20) to track on this network."
+          },
+          "xpub": {
+            "type": "string",
+            "description": "Extended public key used to derive HD wallet addresses.",
+            "example": "xpub6CUGRUonZSQ4TWtTMmzXdrZWMi..."
+          }
+        }
+      },
+      "ChainDataSchema": {
+        "type": "object",
+        "title": "ChainData",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "rpc_urls",
+          "chain_type",
+          "xpub",
+          "native_symbol",
+          "decimals",
+          "last_processed_block",
+          "block_lag",
+          "safe_lag",
+          "required_confirmations",
+          "watch_addresses"
+        ],
+        "properties": {
+          "active": {
+            "type": "boolean",
+            "description": "Indicates whether the network is currently active and processing events.",
+            "example": true
+          },
+          "block_lag": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Current delay in blocks between the node and the tip.",
+            "example": 0,
+            "minimum": 0
+          },
+          "chain_type": { "$ref": "#/components/schemas/ChainTypeSchema" },
+          "decimals": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of decimal places for the native currency",
+            "example": 18,
+            "minimum": 0
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Internal system ID for the network.",
+            "example": 1
+          },
+          "last_processed_block": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The block number that was last processed by the indexer.",
+            "example": 19432890,
+            "minimum": 0
+          },
+          "logo_url": {
+            "type": ["string", "null"],
+            "description": "URL pointing to the network's logo icon.",
+            "example": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+          },
+          "name": {
+            "type": "string",
+            "description": "Unique canonical identifier of the network.",
+            "example": "ethereum"
+          },
+          "native_symbol": {
+            "type": "string",
+            "description": "The native currency symbol of the network.",
+            "example": "ETH"
+          },
+          "required_confirmations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of blocks required to consider a transaction fully confirmed.",
+            "example": 64,
+            "minimum": 0
+          },
+          "rpc_urls": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of RPC endpoint URLs used to interact with the network.",
+            "example": [
+              "https://eth-mainnet.g.alchemy.com/v2/...",
+              "https://rpc.ankr.com/eth"
+            ]
+          },
+          "safe_lag": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Minimum block depth required to trust empty log responses from RPC (prevents false-empty logs)",
+            "example": 12,
+            "minimum": 0
+          },
+          "watch_addresses": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of explicitly watched addresses on this network.",
+            "example": ["0x1234567890abcdef1234567890abcdef12345678"],
+            "uniqueItems": true
+          },
+          "xpub": {
+            "type": "string",
+            "description": "Extended public key used to derive HD wallet addresses for this network.",
+            "example": "xpub6CUGRUonZSQ4TWtTMmzXdrZWMi..."
+          }
+        }
+      },
+      "ChainTypeSchema": {
+        "type": "string",
+        "title": "ChainType",
+        "enum": ["EVM"]
+      },
+      "CreateInvoiceReqSchema": {
+        "type": "object",
+        "title": "CreateInvoiceReq",
+        "required": ["network", "asset", "amount", "duration"],
+        "properties": {
+          "amount": {
+            "type": "number",
+            "format": "double",
+            "description": "The exact amount of the asset expected to be paid.",
+            "example": 150.5
+          },
+          "asset": {
+            "type": "string",
+            "description": "The asset to be paid (native coin symbol or token ticker).",
+            "example": "USDT"
+          },
+          "duration": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Duration in seconds before the invoice expires (default is 900 seconds / 15 minutes).",
+            "example": 3600,
+            "minimum": 0
+          },
+          "network": {
+            "type": "string",
+            "description": "The target blockchain network.",
+            "example": "ethereum"
+          },
+          "webhook_config": {
+            "oneOf": [
+              { "type": "null" },
+              {
+                "$ref": "#/components/schemas/WebhookConfigSchema",
+                "description": "Configuration for delivering real-time webhook updates about this specific invoice."
+              }
+            ]
+          }
+        }
+      },
+      "CreateKeyReqSchema": {
+        "type": "object",
+        "title": "CreateKeyReq",
+        "required": ["name", "prefix", "permissions"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable identifier for this key.",
+            "example": "Payment Gateway Key"
+          },
+          "permissions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PermissionSchema" },
+            "description": "List of permissions granted to this key. Publishable keys (`pk_live`) can only have `public_read`.",
+            "example": ["write_invoices", "read_invoices"]
+          },
+          "prefix": {
+            "$ref": "#/components/schemas/ApiKeyPrefixSchema",
+            "description": "The environment prefix for the key (secret or publishable)."
+          }
+        }
+      },
+      "CreateKeyResSchema": {
+        "type": "object",
+        "title": "CreateKeyRes",
+        "required": ["raw_key", "key_id"],
+        "properties": {
+          "key_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The UUID of the generated key record.",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "raw_key": {
+            "type": "string",
+            "description": "The raw secret API key. **Store this securely, it will not be shown again.**",
+            "example": "sk_live_abc123def456ghi789"
+          }
+        }
+      },
+      "ErrorObjectSchema": {
+        "type": "object",
+        "title": "ErrorObject",
+        "required": ["err_type", "message"],
+        "properties": {
+          "code": {
+            "type": ["string", "null"],
+            "description": "A short code indicating the specific error.",
+            "example": "resource_missing"
+          },
+          "err_type": {
+            "type": "string",
+            "description": "The type of error returned.",
+            "example": "invalid_request_error"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human-readable message providing more details about the error.",
+            "example": "Chain 'polygon' not found"
+          },
+          "param": {
+            "type": ["string", "null"],
+            "description": "The parameter that caused the error, if applicable.",
+            "example": "network"
+          }
+        }
+      },
+      "ErrorResponseSchema": {
+        "type": "object",
+        "title": "ErrorResponse",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorObjectSchema",
+            "description": "The error object containing details about the failure."
+          }
+        }
+      },
+      "InvoiceSchema": {
+        "type": "object",
+        "title": "Invoice",
+        "required": [
+          "id",
+          "address_index",
+          "address",
+          "amount",
+          "amount_raw",
+          "paid",
+          "paid_raw",
+          "token",
+          "network",
+          "decimals",
+          "created_at",
+          "expires_at",
+          "status"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "The unique cryptocurrency address generated for this invoice.",
+            "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+          },
+          "address_index": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Internal index used for HD wallet address derivation.",
+            "example": 42,
+            "minimum": 0
+          },
+          "amount": {
+            "type": "string",
+            "description": "Human-readable target amount.",
+            "example": "150.50"
+          },
+          "amount_raw": {
+            "type": "string",
+            "description": "Raw target amount in minimal indivisible units (e.g., Wei). Passed as a string to prevent precision loss.",
+            "example": "150500000"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T15:00:00Z"
+          },
+          "decimals": {
+            "type": "integer",
+            "format": "int32",
+            "example": 6,
+            "minimum": 0
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T16:00:00Z"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "network": { "type": "string", "example": "ethereum" },
+          "paid": {
+            "type": "string",
+            "description": "Human-readable amount that has been paid so far.",
+            "example": "0.00"
+          },
+          "paid_raw": {
+            "type": "string",
+            "description": "Raw paid amount in minimal units. Passed as a string.",
+            "example": "0"
+          },
+          "status": { "$ref": "#/components/schemas/InvoiceStatusSchema" },
+          "token": { "type": "string", "example": "USDT" },
+          "webhook_max_retries": {
+            "type": ["integer", "null"],
+            "format": "int32",
+            "example": 3,
+            "minimum": 0
+          },
+          "webhook_secret": {
+            "type": ["string", "null"],
+            "example": "whsec_abc123..."
+          },
+          "webhook_url": {
+            "type": ["string", "null"],
+            "example": "https://your-domain.com/webhooks/crypto"
+          }
+        }
+      },
+      "InvoiceStatusSchema": {
+        "type": "string",
+        "title": "InvoiceStatus",
+        "enum": ["Pending", "Paid", "Expired", "Cancelled"]
+      },
+      "PaginatedVecPageSchema_InvoiceSchema": {
+        "type": "object",
+        "required": ["items", "total", "page_size", "page"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Invoice",
+              "required": [
+                "id",
+                "address_index",
+                "address",
+                "amount",
+                "amount_raw",
+                "paid",
+                "paid_raw",
+                "token",
+                "network",
+                "decimals",
+                "created_at",
+                "expires_at",
+                "status"
+              ],
+              "properties": {
+                "address": {
+                  "type": "string",
+                  "description": "The unique cryptocurrency address generated for this invoice.",
+                  "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                },
+                "address_index": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Internal index used for HD wallet address derivation.",
+                  "example": 42,
+                  "minimum": 0
+                },
+                "amount": {
+                  "type": "string",
+                  "description": "Human-readable target amount.",
+                  "example": "150.50"
+                },
+                "amount_raw": {
+                  "type": "string",
+                  "description": "Raw target amount in minimal indivisible units (e.g., Wei). Passed as a string to prevent precision loss.",
+                  "example": "150500000"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2026-06-26T15:00:00Z"
+                },
+                "decimals": {
+                  "type": "integer",
+                  "format": "int32",
+                  "example": 6,
+                  "minimum": 0
+                },
+                "expires_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2026-06-26T16:00:00Z"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "network": { "type": "string", "example": "ethereum" },
+                "paid": {
+                  "type": "string",
+                  "description": "Human-readable amount that has been paid so far.",
+                  "example": "0.00"
+                },
+                "paid_raw": {
+                  "type": "string",
+                  "description": "Raw paid amount in minimal units. Passed as a string.",
+                  "example": "0"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/InvoiceStatusSchema"
+                },
+                "token": { "type": "string", "example": "USDT" },
+                "webhook_max_retries": {
+                  "type": ["integer", "null"],
+                  "format": "int32",
+                  "example": 3,
+                  "minimum": 0
+                },
+                "webhook_secret": {
+                  "type": ["string", "null"],
+                  "example": "whsec_abc123..."
+                },
+                "webhook_url": {
+                  "type": ["string", "null"],
+                  "example": "https://your-domain.com/webhooks/crypto"
+                }
+              }
+            },
+            "description": "Array containing the requested resources for the current page."
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Current page number (1-indexed).",
+            "example": 1,
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of items returned per page.",
+            "example": 20,
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of items available across all pages.",
+            "example": 150,
+            "minimum": 0
+          }
+        }
+      },
+      "PaginatedVecPageSchema_PaymentSchema": {
+        "type": "object",
+        "required": ["items", "total", "page_size", "page"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Payment",
+              "required": [
+                "id",
+                "from",
+                "to",
+                "network",
+                "token",
+                "tx_hash",
+                "amount_raw",
+                "block_number",
+                "block_hash",
+                "status",
+                "created_at"
+              ],
+              "properties": {
+                "amount_raw": {
+                  "type": "string",
+                  "description": "Raw transferred amount in minimal indivisible units (e.g., Wei). Passed as a string to prevent precision loss.",
+                  "example": "150500000"
+                },
+                "block_hash": {
+                  "type": "string",
+                  "description": "The hash of the block containing the transaction.",
+                  "example": "0xabc...123"
+                },
+                "block_number": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "The block number in which the transaction was included.",
+                  "example": 19432890,
+                  "minimum": 0
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2026-06-26T15:10:00Z"
+                },
+                "from": {
+                  "type": "string",
+                  "description": "The sender's wallet address.",
+                  "example": "0x123...abc"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                },
+                "log_index": {
+                  "type": ["integer", "null"],
+                  "format": "int64",
+                  "description": "The log index of the event within the block (for EVM-compatible chains).",
+                  "example": 12,
+                  "minimum": 0
+                },
+                "network": {
+                  "type": "string",
+                  "description": "The canonical name of the blockchain network.",
+                  "example": "ethereum"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/PaymentStatusSchema"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "The receiver's wallet address (usually the invoice address).",
+                  "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                },
+                "token": {
+                  "type": "string",
+                  "description": "The ticker symbol of the transferred token.",
+                  "example": "USDT"
+                },
+                "tx_hash": {
+                  "type": "string",
+                  "description": "The transaction hash on the blockchain.",
+                  "example": "0x987...def"
+                }
+              }
+            },
+            "description": "Array containing the requested resources for the current page."
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Current page number (1-indexed).",
+            "example": 1,
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of items returned per page.",
+            "example": 20,
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of items available across all pages.",
+            "example": 150,
+            "minimum": 0
+          }
+        }
+      },
+      "PaginatedVecPageSchema_PublicPaymentModelSchema": {
+        "type": "object",
+        "required": ["items", "total", "page_size", "page"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "PublicPaymentModel",
+              "required": [
+                "id",
+                "from",
+                "to",
+                "network",
+                "token",
+                "tx_hash",
+                "amount",
+                "block_number",
+                "block_hash",
+                "status",
+                "created_at"
+              ],
+              "properties": {
+                "amount": { "type": "string", "example": "150.50" },
+                "block_hash": { "type": "string", "example": "0xabc...123" },
+                "block_number": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 19432890,
+                  "minimum": 0
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2026-06-26T15:10:00Z"
+                },
+                "from": { "type": "string", "example": "0x123...abc" },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                },
+                "network": { "type": "string", "example": "ethereum" },
+                "status": {
+                  "$ref": "#/components/schemas/PaymentStatusSchema"
+                },
+                "to": {
+                  "type": "string",
+                  "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+                },
+                "token": { "type": "string", "example": "USDT" },
+                "tx_hash": { "type": "string", "example": "0x987...def" }
+              }
+            },
+            "description": "Array containing the requested resources for the current page."
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Current page number (1-indexed).",
+            "example": 1,
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of items returned per page.",
+            "example": 20,
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of items available across all pages.",
+            "example": 150,
+            "minimum": 0
+          }
+        }
+      },
+      "PaginatedVecPageSchema_WebhookSchema": {
+        "type": "object",
+        "required": ["items", "total", "page_size", "page"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "Webhook",
+              "required": [
+                "id",
+                "invoice_id",
+                "url",
+                "payload",
+                "status",
+                "attempts",
+                "max_retries",
+                "next_retry",
+                "created_at"
+              ],
+              "properties": {
+                "attempts": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "The current number of delivery attempts made.",
+                  "example": 1,
+                  "minimum": 0
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2026-06-26T15:00:00Z"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "example": "987e6543-e21b-34d3-b567-526614174999"
+                },
+                "invoice_id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "The ID of the invoice that triggered this webhook.",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "max_retries": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "The maximum number of retries allowed before permanently failing.",
+                  "example": 3,
+                  "minimum": 0
+                },
+                "next_retry": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp indicating when the next delivery attempt will occur (if pending/processing).",
+                  "example": "2026-06-26T15:05:00Z"
+                },
+                "payload": {
+                  "$ref": "#/components/schemas/WebhookEventSchema",
+                  "description": "The event data payload."
+                },
+                "status": {
+                  "$ref": "#/components/schemas/WebhookStatusSchema"
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The destination URL where the webhook payload is sent.",
+                  "example": "https://your-domain.com/webhooks/crypto"
+                }
+              }
+            },
+            "description": "Array containing the requested resources for the current page."
+          },
+          "page": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Current page number (1-indexed).",
+            "example": 1,
+            "minimum": 0
+          },
+          "page_size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of items returned per page.",
+            "example": 20,
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total number of items available across all pages.",
+            "example": 150,
+            "minimum": 0
+          }
+        }
+      },
+      "PartialChainUpdateSchema": {
+        "type": "object",
+        "title": "PartialChainUpdate",
+        "properties": {
+          "active": {
+            "type": ["boolean", "null"],
+            "description": "Set to true/false to enable or disable the network.",
+            "example": false
+          },
+          "block_lag": {
+            "type": ["integer", "null"],
+            "format": "int32",
+            "description": "Update the block lag threshold.",
+            "example": 2,
+            "minimum": 0
+          },
+          "last_processed_block": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Forcefully override the last processed block pointer.",
+            "example": 19432000,
+            "minimum": 0
+          },
+          "logo_url": {
+            "type": ["string", "null"],
+            "description": "Update the network logo URL.",
+            "example": "https://example.com/logo.png"
+          },
+          "required_confirmations": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "Update the required block confirmations.",
+            "example": 32,
+            "minimum": 0
+          },
+          "rpc_urls": {
+            "type": ["array", "null"],
+            "items": { "type": "string" },
+            "description": "Overwrite the list of RPC URLs.",
+            "example": ["https://cloudflare-eth.com"]
+          },
+          "safe_lag": {
+            "type": ["integer", "null"],
+            "format": "int32",
+            "description": "Update the safe lag depth.",
+            "example": 12,
+            "minimum": 0
+          },
+          "xpub": {
+            "type": ["string", "null"],
+            "description": "Update the extended public key.",
+            "example": "xpub..."
+          }
+        }
+      },
+      "PaymentSchema": {
+        "type": "object",
+        "title": "Payment",
+        "required": [
+          "id",
+          "from",
+          "to",
+          "network",
+          "token",
+          "tx_hash",
+          "amount_raw",
+          "block_number",
+          "block_hash",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "amount_raw": {
+            "type": "string",
+            "description": "Raw transferred amount in minimal indivisible units (e.g., Wei). Passed as a string to prevent precision loss.",
+            "example": "150500000"
+          },
+          "block_hash": {
+            "type": "string",
+            "description": "The hash of the block containing the transaction.",
+            "example": "0xabc...123"
+          },
+          "block_number": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The block number in which the transaction was included.",
+            "example": 19432890,
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T15:10:00Z"
+          },
+          "from": {
+            "type": "string",
+            "description": "The sender's wallet address.",
+            "example": "0x123...abc"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "log_index": {
+            "type": ["integer", "null"],
+            "format": "int64",
+            "description": "The log index of the event within the block (for EVM-compatible chains).",
+            "example": 12,
+            "minimum": 0
+          },
+          "network": {
+            "type": "string",
+            "description": "The canonical name of the blockchain network.",
+            "example": "ethereum"
+          },
+          "status": { "$ref": "#/components/schemas/PaymentStatusSchema" },
+          "to": {
+            "type": "string",
+            "description": "The receiver's wallet address (usually the invoice address).",
+            "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+          },
+          "token": {
+            "type": "string",
+            "description": "The ticker symbol of the transferred token.",
+            "example": "USDT"
+          },
+          "tx_hash": {
+            "type": "string",
+            "description": "The transaction hash on the blockchain.",
+            "example": "0x987...def"
+          }
+        }
+      },
+      "PaymentStatusSchema": {
+        "type": "string",
+        "title": "PaymentStatus",
+        "enum": ["Pending", "Confirming", "Confirmed", "Failed"]
+      },
+      "PermissionSchema": {
+        "type": "string",
+        "title": "Permission",
+        "enum": ["FullAccess", "WriteInvoices", "ReadInvoices", "PublicRead"]
+      },
+      "PublicInvoiceModelSchema": {
+        "type": "object",
+        "title": "PublicInvoiceModel",
+        "required": [
+          "id",
+          "address",
+          "amount",
+          "paid",
+          "token",
+          "network",
+          "created_at",
+          "expires_at",
+          "status"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+          },
+          "amount": { "type": "string", "example": "150.50" },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T15:00:00Z"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T16:00:00Z"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "network": { "type": "string", "example": "ethereum" },
+          "paid": { "type": "string", "example": "0.00" },
+          "status": { "$ref": "#/components/schemas/InvoiceStatusSchema" },
+          "token": { "type": "string", "example": "USDT" }
+        }
+      },
+      "PublicPaymentModelSchema": {
+        "type": "object",
+        "title": "PublicPaymentModel",
+        "required": [
+          "id",
+          "from",
+          "to",
+          "network",
+          "token",
+          "tx_hash",
+          "amount",
+          "block_number",
+          "block_hash",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "amount": { "type": "string", "example": "150.50" },
+          "block_hash": { "type": "string", "example": "0xabc...123" },
+          "block_number": {
+            "type": "integer",
+            "format": "int64",
+            "example": 19432890,
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T15:10:00Z"
+          },
+          "from": { "type": "string", "example": "0x123...abc" },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+          },
+          "network": { "type": "string", "example": "ethereum" },
+          "status": { "$ref": "#/components/schemas/PaymentStatusSchema" },
+          "to": {
+            "type": "string",
+            "example": "0x742d35Cc6634C0532925a3b844Bc454e4438f44e"
+          },
+          "token": { "type": "string", "example": "USDT" },
+          "tx_hash": { "type": "string", "example": "0x987...def" }
+        }
+      },
+      "RevokeKeyResSchema": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiKeyRecordSchema",
+            "description": "The API key record that was just revoked."
+          },
+          {
+            "type": "object",
+            "required": ["revoked_at"],
+            "properties": {
+              "revoked_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp indicating exactly when the key was deactivated.",
+                "example": "2026-06-26T15:00:00Z"
+              }
+            }
+          }
+        ],
+        "title": "RevokeKeyRes"
+      },
+      "TokenConfigSchema": {
+        "type": "object",
+        "title": "TokenConfig",
+        "required": ["symbol", "contract", "decimals"],
+        "properties": {
+          "contract": {
+            "type": "string",
+            "description": "The smart contract address of the token on the network.",
+            "example": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+          },
+          "decimals": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of decimal places the token uses.",
+            "example": 6,
+            "minimum": 0
+          },
+          "logo_url": {
+            "type": ["string", "null"],
+            "description": "Optional URL pointing to the token's logo icon.",
+            "example": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The ticker symbol of the token (e.g., 'USDT').",
+            "example": "USDT"
+          }
+        }
+      },
+      "TokenDataSchema": {
+        "type": "object",
+        "title": "TokenData",
+        "required": ["id", "chain_id", "symbol", "contract", "decimals"],
+        "properties": {
+          "chain_id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Internal system ID of the chain this token belongs to.",
+            "example": 1
+          },
+          "contract": {
+            "type": "string",
+            "description": "The smart contract address of the token.",
+            "example": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+          },
+          "decimals": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Number of decimal places the token uses.",
+            "example": 6,
+            "minimum": 0
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Internal system ID for the token.",
+            "example": 1
+          },
+          "logo_url": {
+            "type": ["string", "null"],
+            "description": "URL pointing to the token's logo icon.",
+            "example": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+          },
+          "symbol": {
+            "type": "string",
+            "description": "The ticker symbol of the token.",
+            "example": "USDT"
+          }
+        }
+      },
+      "VecResponseSchema_ApiKeyRecordSchema": {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "ApiKeyRecord",
+              "required": [
+                "id",
+                "name",
+                "prefix",
+                "permissions",
+                "is_active",
+                "created_at"
+              ],
+              "properties": {
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Timestamp indicating when the key was created.",
+                  "example": "2026-06-26T15:00:00Z"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "The unique identifier (UUID) of the API key record.",
+                  "example": "123e4567-e89b-12d3-a456-426614174000"
+                },
+                "is_active": {
+                  "type": "boolean",
+                  "description": "Indicates whether the key is currently active and can be used for authentication.",
+                  "example": true
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Human-readable identifier for this key.",
+                  "example": "Payment Gateway Key"
+                },
+                "permissions": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PermissionSchema" },
+                  "description": "List of permissions granted to this key.",
+                  "example": ["write_invoices", "read_invoices"]
+                },
+                "prefix": {
+                  "type": "string",
+                  "description": "The environment prefix for the key.",
+                  "example": "sk_live"
+                }
+              }
+            },
+            "description": "Array containing the requested resources."
+          }
+        }
+      },
+      "VecResponseSchema_ChainDataSchema": {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "ChainData",
+              "required": [
+                "id",
+                "name",
+                "active",
+                "rpc_urls",
+                "chain_type",
+                "xpub",
+                "native_symbol",
+                "decimals",
+                "last_processed_block",
+                "block_lag",
+                "safe_lag",
+                "required_confirmations",
+                "watch_addresses"
+              ],
+              "properties": {
+                "active": {
+                  "type": "boolean",
+                  "description": "Indicates whether the network is currently active and processing events.",
+                  "example": true
+                },
+                "block_lag": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Current delay in blocks between the node and the tip.",
+                  "example": 0,
+                  "minimum": 0
+                },
+                "chain_type": {
+                  "$ref": "#/components/schemas/ChainTypeSchema"
+                },
+                "decimals": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Number of decimal places for the native currency",
+                  "example": 18,
+                  "minimum": 0
+                },
+                "id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Internal system ID for the network.",
+                  "example": 1
+                },
+                "last_processed_block": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "The block number that was last processed by the indexer.",
+                  "example": 19432890,
+                  "minimum": 0
+                },
+                "logo_url": {
+                  "type": ["string", "null"],
+                  "description": "URL pointing to the network's logo icon.",
+                  "example": "https://cryptologos.cc/logos/ethereum-eth-logo.png"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Unique canonical identifier of the network.",
+                  "example": "ethereum"
+                },
+                "native_symbol": {
+                  "type": "string",
+                  "description": "The native currency symbol of the network.",
+                  "example": "ETH"
+                },
+                "required_confirmations": {
+                  "type": "integer",
+                  "format": "int64",
+                  "description": "Number of blocks required to consider a transaction fully confirmed.",
+                  "example": 64,
+                  "minimum": 0
+                },
+                "rpc_urls": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "List of RPC endpoint URLs used to interact with the network.",
+                  "example": [
+                    "https://eth-mainnet.g.alchemy.com/v2/...",
+                    "https://rpc.ankr.com/eth"
+                  ]
+                },
+                "safe_lag": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Minimum block depth required to trust empty log responses from RPC (prevents false-empty logs)",
+                  "example": 12,
+                  "minimum": 0
+                },
+                "watch_addresses": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "List of explicitly watched addresses on this network.",
+                  "example": ["0x1234567890abcdef1234567890abcdef12345678"],
+                  "uniqueItems": true
+                },
+                "xpub": {
+                  "type": "string",
+                  "description": "Extended public key used to derive HD wallet addresses for this network.",
+                  "example": "xpub6CUGRUonZSQ4TWtTMmzXdrZWMi..."
+                }
+              }
+            },
+            "description": "Array containing the requested resources."
+          }
+        }
+      },
+      "VecResponseSchema_TokenDataSchema": {
+        "type": "object",
+        "required": ["items"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "title": "TokenData",
+              "required": ["id", "chain_id", "symbol", "contract", "decimals"],
+              "properties": {
+                "chain_id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Internal system ID of the chain this token belongs to.",
+                  "example": 1
+                },
+                "contract": {
+                  "type": "string",
+                  "description": "The smart contract address of the token.",
+                  "example": "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+                },
+                "decimals": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Number of decimal places the token uses.",
+                  "example": 6,
+                  "minimum": 0
+                },
+                "id": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Internal system ID for the token.",
+                  "example": 1
+                },
+                "logo_url": {
+                  "type": ["string", "null"],
+                  "description": "URL pointing to the token's logo icon.",
+                  "example": "https://cryptologos.cc/logos/tether-usdt-logo.png"
+                },
+                "symbol": {
+                  "type": "string",
+                  "description": "The ticker symbol of the token.",
+                  "example": "USDT"
+                }
+              }
+            },
+            "description": "Array containing the requested resources."
+          }
+        }
+      },
+      "WebhookConfigSchema": {
+        "type": "object",
+        "title": "WebhookConfig",
+        "required": ["url"],
+        "properties": {
+          "max_retries": {
+            "type": ["integer", "null"],
+            "format": "int32",
+            "description": "Maximum number of retry attempts if the delivery fails.",
+            "example": 3,
+            "minimum": 0
+          },
+          "secret": {
+            "type": ["string", "null"],
+            "description": "Optional secret key used to sign the webhook payload (HMAC SHA256).",
+            "example": "whsec_abc123..."
+          },
+          "url": {
+            "type": "string",
+            "description": "The URL that will receive POST requests for invoice events.",
+            "example": "https://your-domain.com/webhooks/crypto"
+          }
+        }
+      },
+      "WebhookEventSchema": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Fired immediately when a transaction to the invoice address is detected on the network (0 confirmations).",
+            "required": ["data", "event_type"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "description": "Fired immediately when a transaction to the invoice address is detected on the network (0 confirmations).",
+                "required": ["invoice_id", "tx_hash", "amount", "currency"],
+                "properties": {
+                  "amount": { "type": "string", "example": "150.50" },
+                  "currency": { "type": "string", "example": "USDT" },
+                  "invoice_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  },
+                  "tx_hash": { "type": "string", "example": "0x987...def" }
+                }
+              },
+              "event_type": { "type": "string", "enum": ["tx_detected"] }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Fired when a transaction reaches the required number of confirmations.",
+            "required": ["data", "event_type"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "description": "Fired when a transaction reaches the required number of confirmations.",
+                "required": ["invoice_id", "tx_hash", "confirmations"],
+                "properties": {
+                  "confirmations": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 5,
+                    "minimum": 0
+                  },
+                  "invoice_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  },
+                  "tx_hash": { "type": "string", "example": "0x987...def" }
+                }
+              },
+              "event_type": { "type": "string", "enum": ["tx_confirmed"] }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Fired when the invoice is fully paid (total confirmed payments >= target amount).",
+            "required": ["data", "event_type"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "description": "Fired when the invoice is fully paid (total confirmed payments >= target amount).",
+                "required": ["invoice_id", "paid_amount"],
+                "properties": {
+                  "invoice_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  },
+                  "paid_amount": { "type": "string", "example": "150.50" }
+                }
+              },
+              "event_type": { "type": "string", "enum": ["invoice_paid"] }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Fired when the invoice's time-to-live expires before being fully paid.",
+            "required": ["data", "event_type"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "description": "Fired when the invoice's time-to-live expires before being fully paid.",
+                "required": ["invoice_id"],
+                "properties": {
+                  "invoice_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  }
+                }
+              },
+              "event_type": { "type": "string", "enum": ["invoice_expired"] }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Fired when the invoice is manually cancelled via the API.",
+            "required": ["data", "event_type"],
+            "properties": {
+              "data": {
+                "type": "object",
+                "description": "Fired when the invoice is manually cancelled via the API.",
+                "required": ["invoice_id"],
+                "properties": {
+                  "invoice_id": {
+                    "type": "string",
+                    "format": "uuid",
+                    "example": "123e4567-e89b-12d3-a456-426614174000"
+                  }
+                }
+              },
+              "event_type": { "type": "string", "enum": ["invoice_cancelled"] }
+            }
+          }
+        ],
+        "title": "WebhookEvent",
+        "description": "The specific event payload that will be sent to the webhook URL."
+      },
+      "WebhookSchema": {
+        "type": "object",
+        "title": "Webhook",
+        "required": [
+          "id",
+          "invoice_id",
+          "url",
+          "payload",
+          "status",
+          "attempts",
+          "max_retries",
+          "next_retry",
+          "created_at"
+        ],
+        "properties": {
+          "attempts": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The current number of delivery attempts made.",
+            "example": 1,
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-26T15:00:00Z"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "987e6543-e21b-34d3-b567-526614174999"
+          },
+          "invoice_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The ID of the invoice that triggered this webhook.",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "max_retries": {
+            "type": "integer",
+            "format": "int32",
+            "description": "The maximum number of retries allowed before permanently failing.",
+            "example": 3,
+            "minimum": 0
+          },
+          "next_retry": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp indicating when the next delivery attempt will occur (if pending/processing).",
+            "example": "2026-06-26T15:05:00Z"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/WebhookEventSchema",
+            "description": "The event data payload."
+          },
+          "status": { "$ref": "#/components/schemas/WebhookStatusSchema" },
+          "url": {
+            "type": "string",
+            "description": "The destination URL where the webhook payload is sent.",
+            "example": "https://your-domain.com/webhooks/crypto"
+          }
+        }
+      },
+      "WebhookStatusSchema": {
+        "type": "string",
+        "title": "WebhookStatus",
+        "enum": ["Pending", "Processing", "Delivered", "Failed"]
+      }
+    },
+    "securitySchemes": {
+      "bearer_auth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "sk_live_ / pk_live_",
+        "description": "Authenticate requests using your API key. Prefix it with `Bearer `, e.g., `Bearer sk_live_123`"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "checkout",
+      "description": "Public endpoints for checkout pages and customers. Safe to expose."
+    },
+    { "name": "auth", "description": "Management of API Keys and permissions" },
+    {
+      "name": "chains",
+      "description": "Configuration of blockchain networks and supported tokens"
+    },
+    {
+      "name": "invoices",
+      "description": "Creation and management of cryptocurrency invoices"
+    },
+    {
+      "name": "payments",
+      "description": "Internal ledger of all detected blockchain transactions"
+    },
+    {
+      "name": "webhooks",
+      "description": "Delivery logs and statuses for outgoing webhook events"
+    }
+  ]
+}

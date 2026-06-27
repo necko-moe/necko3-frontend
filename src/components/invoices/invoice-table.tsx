@@ -188,7 +188,7 @@ export function InvoiceTable({ invoices, onSelect }: InvoiceTableProps) {
                           size="icon"
                           className="size-7"
                           onClick={() =>
-                            navigate(`/payments?invoice_id=${inv.id}`)
+                            navigate(`/payments?to=${inv.address}`)
                           }
                         >
                           <CreditCard className="size-3.5" />

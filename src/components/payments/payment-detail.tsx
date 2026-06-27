@@ -1,25 +1,17 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
 import type { PaymentSchema } from "@/types/payment";
-import { useAuth } from "@/context/auth-context";
-import { apiFetch } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { CopyField, InfoRow, TimeField } from "@/components/shared/detail-primitives";
-import { ConfirmDeleteDialog } from "@/components/chains/confirm-delete-dialog";
 import {
   ArrowLeft,
-  XCircle,
   Clock,
   Hash,
   Globe,
   Coins,
-  FileText,
   ArrowRightLeft,
   Wallet,
   Layers,
@@ -29,53 +21,26 @@ import {
 interface PaymentDetailProps {
   payment: PaymentSchema;
   onBack: () => void;
-  onCancelled: () => void;
 }
 
 const statusConfig: Record<
   string,
   { badge: "default" | "secondary" | "destructive" | "outline"; dot: string }
 > = {
+  Pending: { dot: "bg-zinc-400 dark:bg-zinc-500", badge: "secondary" },
   Confirming: { dot: "bg-amber-400", badge: "outline" },
   Confirmed: { dot: "bg-emerald-500", badge: "default" },
-  Cancelled: { dot: "bg-destructive/60", badge: "destructive" },
+  Lost: { dot: "bg-rose-400 dark:bg-rose-500", badge: "outline" },
+  Failed: { dot: "bg-destructive", badge: "destructive" },
 };
 
 export function PaymentDetail({
   payment,
   onBack,
-  onCancelled,
 }: PaymentDetailProps) {
-  const { apiKey } = useAuth();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-
-  const [cancelOpen, setCancelOpen] = useState(false);
-  const [cancelling, setCancelling] = useState(false);
 
   const cfg = statusConfig[payment.status] ?? statusConfig.Confirming;
-
-  async function handleCancel() {
-    if (!apiKey) return;
-    setCancelling(true);
-    try {
-      const res = await apiFetch<never>(
-        `/payment/${encodeURIComponent(payment.id)}`,
-        apiKey,
-        { method: "DELETE" },
-      );
-      if (res.status === "error") {
-        toast.error(res.message ?? t("payments.detail.failedToCancel"));
-        return;
-      }
-      setCancelOpen(false);
-      onCancelled();
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.unexpectedError"));
-    } finally {
-      setCancelling(false);
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -97,36 +62,11 @@ export function PaymentDetail({
 
       <Separator />
 
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => navigate(`/invoices?id=${payment.invoice_id}`)}
-        >
-          <FileText className="size-3.5" />
-          {t("payments.detail.viewInvoice")}
-        </Button>
-        {payment.status === "Confirming" && (
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => setCancelOpen(true)}
-          >
-            <XCircle className="size-3.5" />
-            {t("payments.detail.cancelPayment")}
-          </Button>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardContent className="space-y-1 pt-4">
             <InfoRow icon={Hash} label={t("payments.detail.paymentId")}>
               <CopyField value={payment.id} mono />
-            </InfoRow>
-
-            <InfoRow icon={FileText} label={t("payments.detail.invoiceId")}>
-              <CopyField value={payment.invoice_id} mono />
             </InfoRow>
 
             <Separator />
@@ -162,6 +102,10 @@ export function PaymentDetail({
                 <CopyField value={payment.tx_hash} mono />
               </InfoRow>
 
+              <InfoRow icon={Hash} label={t("payments.detail.blockHash")}>
+                <CopyField value={payment.block_hash} mono />
+              </InfoRow>
+
               <InfoRow icon={Layers} label={t("payments.detail.blockNumber")}>
                 {payment.block_number.toLocaleString()}
               </InfoRow>
@@ -193,15 +137,6 @@ export function PaymentDetail({
           </Card>
         </div>
       </div>
-
-      <ConfirmDeleteDialog
-        open={cancelOpen}
-        onOpenChange={setCancelOpen}
-        title={t("payments.detail.cancelTitle")}
-        description={t("payments.detail.cancelDesc")}
-        onConfirm={handleCancel}
-        loading={cancelling}
-      />
     </div>
   );
 }

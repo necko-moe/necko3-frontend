@@ -1,15 +1,15 @@
 export type WebhookStatus =
   | "Pending"
   | "Processing"
-  | "Sent"
-  | "Failed"
-  | "Cancelled";
+  | "Delivered"
+  | "Failed";
 
 export type WebhookEventType =
   | "tx_detected"
   | "tx_confirmed"
   | "invoice_paid"
-  | "invoice_expired";
+  | "invoice_expired"
+  | "invoice_cancelled";
 
 export interface TxDetectedEvent {
   event_type: "tx_detected";
@@ -45,11 +45,19 @@ export interface InvoiceExpiredEvent {
   };
 }
 
+export interface InvoiceCancelledEvent {
+  event_type: "invoice_cancelled";
+  data: {
+    invoice_id: string;
+  };
+}
+
 export type WebhookEventSchema =
   | TxDetectedEvent
   | TxConfirmedEvent
   | InvoicePaidEvent
-  | InvoiceExpiredEvent;
+  | InvoiceExpiredEvent
+  | InvoiceCancelledEvent;
 
 export interface WebhookSchema {
   id: string;

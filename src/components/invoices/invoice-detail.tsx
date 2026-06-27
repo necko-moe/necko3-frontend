@@ -65,9 +65,9 @@ export function InvoiceDetail({
     setCancelling(true);
     try {
       const res = await apiFetch<never>(
-        `/invoice/${encodeURIComponent(invoice.id)}`,
+        `/v1/invoices/${encodeURIComponent(invoice.id)}/cancel`,
         apiKey,
-        { method: "DELETE" },
+        { method: "POST" },
       );
       if (res.status === "error") {
         toast.error(res.message ?? t("invoices.detail.failedToCancel"));
@@ -108,7 +108,7 @@ export function InvoiceDetail({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate(`/payments?invoice_id=${invoice.id}`)}
+          onClick={() => navigate(`/payments?to=${invoice.address}`)}
         >
           <CreditCard className="size-3.5" />
           {t("invoices.detail.payments")}

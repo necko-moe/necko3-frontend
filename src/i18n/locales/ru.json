@@ -4,7 +4,8 @@
     "chains": "Сети",
     "invoices": "Счета",
     "payments": "Платежи",
-    "webhooks": "Вебхуки"
+    "webhooks": "Вебхуки",
+    "apiKeys": "API-ключи"
   },
   "sidebar": {
     "collapseSidebar": "Свернуть боковую панель",
@@ -57,7 +58,9 @@
     "Confirmed": "Подтверждён",
     "Processing": "Обрабатывается",
     "Sent": "Отправлен",
-    "Failed": "Ошибка"
+    "Failed": "Ошибка",
+    "Delivered": "Доставлен",
+    "Lost": "Потерян"
   },
   "languages": {
     "en": "English",
@@ -119,7 +122,8 @@
       "startBlock": "Начальный блок",
       "logoUrl": "URL логотипа",
       "active": "Активна",
-      "addUrl": "Добавить URL"
+      "addUrl": "Добавить URL",
+      "safeLag": "Безопасное отставание"
     },
     "addTokenDialog": {
       "title": "Добавить токен к {{name}}",
@@ -137,6 +141,7 @@
       "nativeSymbolTooltip": "Тикер нативной монеты этой сети (например, ETH, POL). Задаётся при создании.",
       "decimals": "Десятичные знаки",
       "decimalsTooltip": "Количество десятичных знаков нативной монеты. Задаётся при создании.",
+      "nameTooltip": "Уникальное внутреннее название сети (например, Polygon, Ethereum). Используется как идентификатор в API-маршрутах.",
       "xpub": "xpub",
       "xpubTooltip": "Расширенный публичный ключ для генерации уникальных адресов пополнения для каждого счёта.",
       "rpcUrls": "RPC-узлы",
@@ -149,7 +154,9 @@
       "lastProcessedBlockTooltip": "Номер последнего блока, обработанного сканером. Установите 0, чтобы начать с последнего блока в блокчейне.",
       "logoUrl": "URL логотипа",
       "logoUrlTooltip": "URL изображения логотипа сети. Отображается в панели администратора.",
-      "addNewRpcUrl": "Добавить новый RPC-узел..."
+      "addNewRpcUrl": "Добавить новый RPC-узел...",
+      "safeLag": "Безопасное отставание",
+      "safeLagTooltip": "Минимальная глубина блоков, необходимая для доверия пустым логам от RPC (предотвращает ложно-пустые ответы)."
     },
     "tokenList": {
       "searchPlaceholder": "Поиск токенов...",
@@ -159,6 +166,12 @@
       "deleteToken": "Удалить токен",
       "deleteTitle": "Удалить токен {{symbol}}?",
       "deleteDesc": "Это навсегда удалит токен «{{symbol}}» из этой сети. Действие нельзя отменить."
+    },
+    "watchAddresses": "Наблюдаемые адреса",
+    "watchAddressList": {
+      "emptyState": "Наблюдаемые адреса ещё не добавлены.",
+      "viewInvoices": "Посмотреть счета",
+      "viewPayments": "Посмотреть платежи"
     }
   },
   "invoices": {
@@ -298,6 +311,7 @@
       "token": "Токен",
       "transaction": "Транзакция",
       "txHash": "Хеш транзакции",
+      "blockHash": "Хеш блока",
       "blockNumber": "Номер блока",
       "logIndex": "Индекс лога",
       "created": "Создан",
@@ -325,13 +339,15 @@
       "tx_detected": "Транзакция обнаружена",
       "tx_confirmed": "Транзакция подтверждена",
       "invoice_paid": "Счёт оплачен",
-      "invoice_expired": "Счёт истёк"
+      "invoice_expired": "Счёт истёк",
+      "invoice_cancelled": "Счёт отменён"
     },
     "eventFull": {
       "tx_detected": "Транзакция обнаружена",
       "tx_confirmed": "Транзакция подтверждена",
       "invoice_paid": "Счёт оплачен",
-      "invoice_expired": "Счёт истёк"
+      "invoice_expired": "Счёт истёк",
+      "invoice_cancelled": "Счёт отменён"
     },
     "table": {
       "status": "Статус",
@@ -346,17 +362,64 @@
     "detail": {
       "title": "Вебхук",
       "viewInvoice": "Просмотр счёта",
-      "cancelWebhook": "Отменить вебхук",
       "webhookId": "ID вебхука",
       "invoiceId": "ID счёта",
       "url": "URL",
       "attempts": "Попытки",
       "nextRetry": "Следующий повтор",
       "created": "Создан",
-      "eventPayload": "Данные события",
-      "cancelTitle": "Отменить этот вебхук?",
-      "cancelDesc": "Доставка вебхука будет окончательно отменена. Дальнейшие попытки повтора не будут выполняться. Действие нельзя отменить.",
-      "failedToCancel": "Не удалось отменить вебхук"
+      "eventPayload": "Данные события"
+    }
+  },
+  "apiKeys": {
+    "title": "API-ключи",
+    "subtitle": "Управляйте API-ключами для вашей интеграции.",
+    "searchPlaceholder": "Поиск API-ключей...",
+    "add": "Добавить API-ключ",
+    "emptyTitle": "API-ключи не настроены",
+    "emptyDescription": "Создайте первый API-ключ для начала работы.",
+    "noResults": "Нет API-ключей, соответствующих запросу.",
+    "failedToLoad": "Не удалось загрузить API-ключи",
+    "failedToAdd": "Не удалось создать API-ключ",
+    "failedToRevoke": "Не удалось отозвать API-ключ",
+    "active": "Активен",
+    "revoked": "Отозван",
+    "addDialog": {
+      "title": "Создать API-ключ",
+      "description": "Создайте новый API-ключ. Вы увидите секрет только один раз.",
+      "name": "Название *",
+      "namePlaceholder": "Мой API-ключ",
+      "prefix": "Тип ключа *",
+      "permissions": "Разрешения *",
+      "permissionsRequired": "Пожалуйста, выберите хотя бы одно разрешение"
+    },
+    "createdDialog": {
+      "title": "API-ключ создан",
+      "description": "Сохраните этот ключ в безопасном месте. Вы больше не сможете его увидеть!",
+      "warning": "Важно",
+      "apiKey": "Ваш API-ключ",
+      "done": "Готово"
+    },
+    "detail": {
+      "title": "API-ключ",
+      "name": "Название",
+      "prefix": "Тип ключа",
+      "id": "ID ключа",
+      "permissions": "Разрешения",
+      "created": "Создан",
+      "revoke": "Отозвать ключ",
+      "revokeTitle": "Отозвать этот API-ключ?",
+      "revokeDesc": "Этот API-ключ будет окончательно отозван. Он больше не будет работать для аутентификации. Действие нельзя отменить."
+    },
+    "permission": {
+      "FullAccess": "Полный доступ",
+      "WriteInvoices": "Запись счетов",
+      "ReadInvoices": "Чтение счетов",
+      "PublicRead": "Публичное чтение",
+      "full_access": "Полный доступ",
+      "write_invoices": "Запись счетов",
+      "read_invoices": "Чтение счетов",
+      "public_read": "Публичное чтение"
     }
   }
 }

@@ -1,8 +1,7 @@
-export type PaymentStatus = "Confirming" | "Confirmed" | "Cancelled";
+export type PaymentStatus = "Pending" | "Confirming" | "Confirmed" | "Lost" | "Failed";
 
 export interface PaymentSchema {
   id: string;
-  invoice_id: string;
   from: string;
   to: string;
   network: string;
@@ -10,7 +9,8 @@ export interface PaymentSchema {
   tx_hash: string;
   amount_raw: string;
   block_number: number;
-  log_index: number;
+  block_hash: string;
+  log_index: number | null;
   status: PaymentStatus;
   created_at: string;
 }

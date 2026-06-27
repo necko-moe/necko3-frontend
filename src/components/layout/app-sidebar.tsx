@@ -12,6 +12,7 @@ import {
   PanelLeftOpen,
   Menu,
   Check,
+  Key,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -52,6 +53,7 @@ const navItems = [
   { to: "/invoices", labelKey: "nav.invoices", icon: FileText },
   { to: "/payments", labelKey: "nav.payments", icon: CreditCard },
   { to: "/webhooks", labelKey: "nav.webhooks", icon: Webhook },
+  { to: "/api-keys", labelKey: "nav.apiKeys", icon: Key },
 ] as const;
 
 /** Matches footer icon buttons in collapsed sidebar */

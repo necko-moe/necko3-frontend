@@ -22,7 +22,7 @@ export async function apiFetch<T>(
     ...init,
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": apiKey,
+      "Authorization": "Bearer " + apiKey,
       ...init?.headers,
     },
   });
@@ -35,14 +35,32 @@ export async function apiFetch<T>(
     let message = `HTTP ${res.status}`;
     try {
       const body = await res.json();
-      if (typeof body?.message === "string") message = body.message;
+      if (typeof body?.error?.message === "string") {
+        message = body.error.message;
+      } else if (typeof body?.message === "string") {
+        message = body.message;
+      }
     } catch {
       // body wasn't JSON — keep the HTTP status fallback
     }
     throw new Error(message);
   }
 
-  return res.json() as Promise<ApiResponse<T>>;
+  // Handle potentially empty success responses
+  const text = await res.text();
+  let data: any = undefined;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      // Keep it as undefined/unparsed if not JSON
+    }
+  }
+
+  return {
+    status: "success",
+    data,
+  };
 }
 
 /**

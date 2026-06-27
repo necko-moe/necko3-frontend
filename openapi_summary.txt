@@ -1,0 +1,308 @@
+--- Swagger API Summary ---
+Title: necko3
+Version: 0.2.1
+
+--- Paths ---
+GET /v1/api-keys (operationId: list_api_keys) - List all API keys
+  Responses:
+    - 200: List of API keys retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/api-keys (operationId: create_key) - Create a new API key
+  RequestBody schemas:
+    - application/json: #/components/schemas/CreateKeyReqSchema
+  Responses:
+    - 200: API key created successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/api-keys/{id} (operationId: get_key_record) - Get API key details
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: API key metadata retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/api-keys/{id}/revoke (operationId: revoke_key) - Revoke an API key
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: API key successfully revoked
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/chains (operationId: list_chains) - List all blockchain networks
+  Responses:
+    - 200: List of blockchain networks retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/chains (operationId: add_chain) - Add a new blockchain network
+  RequestBody schemas:
+    - application/json: #/components/schemas/ChainConfigSchema
+  Responses:
+    - 200: Chain successfully registered
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/chains/{name} (operationId: get_chain) - Get a specific network
+  Parameters:
+    - name (path): required - string
+  Responses:
+    - 200: Network details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+DELETE /v1/chains/{name} (operationId: delete_chain) - Delete a network
+  Parameters:
+    - name (path): required - string
+  Responses:
+    - 200: Network deleted successfully. Returns the last known state of the deleted chain.
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+PATCH /v1/chains/{name} (operationId: update_chain) - Update network configuration
+  Parameters:
+    - name (path): required - string
+  RequestBody schemas:
+    - application/json: #/components/schemas/PartialChainUpdateSchema
+  Responses:
+    - 200: Network configuration updated successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/chains/{name}/tokens (operationId: list_tokens) - List all tokens for a network
+  Parameters:
+    - name (path): required - string
+  Responses:
+    - 200: List of tokens retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/chains/{name}/tokens (operationId: add_token) - Add a new token to a network
+  Parameters:
+    - name (path): required - string
+  RequestBody schemas:
+    - application/json: #/components/schemas/TokenConfigSchema
+  Responses:
+    - 200: Token successfully registered
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/chains/{name}/tokens/{sym} (operationId: get_token) - Get specific token details
+  Parameters:
+    - name (path): required - string
+    - sym (path): required - string
+  Responses:
+    - 200: Token details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+DELETE /v1/chains/{name}/tokens/{sym} (operationId: delete_token) - Delete a token
+  Parameters:
+    - name (path): required - string
+    - sym (path): required - string
+  Responses:
+    - 200: Token deleted successfully. Returns the last known state of the token.
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/checkout/invoice/{id} (operationId: get_checkout_invoice) - Get public invoice details
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: Public invoice details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/checkout/invoice/{id}/payments (operationId: get_checkout_invoice_payments) - List payments for an invoice
+  Parameters:
+    - id (path): required - string
+    - page_size (query): optional - integer
+    - page (query): optional - integer
+  Responses:
+    - 200: List of payments retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/checkout/invoice/{id}/ws (operationId: invoice_ws_handler) - Subscribe to invoice updates (WebSocket)
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 101: WebSocket protocol successfully upgraded
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/invoices (operationId: list_invoices) - List all invoices
+  Parameters:
+    - status (query): optional - unknown
+    - address (query): optional - string
+    - network (query): optional - string
+    - token (query): optional - string
+    - page_size (query): optional - integer
+    - page (query): optional - integer
+  Responses:
+    - 200: List of invoices retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/invoices (operationId: create_invoice) - Create a new invoice
+  RequestBody schemas:
+    - application/json: #/components/schemas/CreateInvoiceReqSchema
+  Responses:
+    - 200: Invoice created successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/invoices/{id} (operationId: get_invoice) - Get invoice details
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: Invoice details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+POST /v1/invoices/{id}/cancel (operationId: cancel_invoice) - Cancel an invoice
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: Invoice cancelled successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/payments (operationId: list_payments) - List all internal payments
+  Parameters:
+    - from (query): optional - string
+    - to (query): optional - string
+    - network (query): optional - string
+    - token (query): optional - string
+    - block_number (query): optional - integer
+    - block_hash (query): optional - string
+    - status (query): optional - unknown
+    - page_size (query): optional - integer
+    - page (query): optional - integer
+  Responses:
+    - 200: List of payments retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/payments/{id} (operationId: get_payment) - Get payment details
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: Payment details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/proxy/image (operationId: image_proxy) - Proxy and cache external images
+  Parameters:
+    - url (query): required - string
+  Responses:
+    - 200: The proxied image bytes.
+    - 400: Failed to fetch the source image or server returned non-success status code.
+    - 500: Failed to read or process image bytes on the proxy side.
+GET /v1/webhooks (operationId: list_webhooks) - List webhook deliveries
+  Parameters:
+    - invoice_id (query): optional - string
+    - event_type (query): optional - string
+    - url (query): optional - string
+    - status (query): optional - unknown
+    - page_size (query): optional - integer
+    - page (query): optional - integer
+  Responses:
+    - 200: List of webhook logs retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+GET /v1/webhooks/{id} (operationId: get_webhook) - Get webhook delivery details
+  Parameters:
+    - id (path): required - string
+  Responses:
+    - 200: Webhook details retrieved successfully
+    - 400: Bad request - Validation error
+    - 401: Unauthorized - Invalid or missing API key
+    - 403: Forbidden - Insufficient permissions or API key disabled
+    - 404: Resource not found
+    - 500: Internal Server Error
+
+--- Components Schemas ---
+- ApiKeyPrefixSchema: type=string, properties=[]
+- ApiKeyRecordSchema: type=object, properties=[created_at, id, is_active, name, permissions, prefix]
+- ChainConfigSchema: type=object, properties=[active, block_lag, chain_type, decimals, last_processed_block, logo_url, name, native_symbol, required_confirmations, rpc_urls, safe_lag, tokens, xpub]
+- ChainDataSchema: type=object, properties=[active, block_lag, chain_type, decimals, id, last_processed_block, logo_url, name, native_symbol, required_confirmations, rpc_urls, safe_lag, watch_addresses, xpub]
+- ChainTypeSchema: type=string, properties=[]
+- CreateInvoiceReqSchema: type=object, properties=[amount, asset, duration, network, webhook_config]
+- CreateKeyReqSchema: type=object, properties=[name, permissions, prefix]
+- CreateKeyResSchema: type=object, properties=[key_id, raw_key]
+- ErrorObjectSchema: type=object, properties=[code, err_type, message, param]
+- ErrorResponseSchema: type=object, properties=[error]
+- InvoiceSchema: type=object, properties=[address, address_index, amount, amount_raw, created_at, decimals, expires_at, id, network, paid, paid_raw, status, token, webhook_max_retries, webhook_secret, webhook_url]
+- InvoiceStatusSchema: type=string, properties=[]
+- PaginatedVecPageSchema_InvoiceSchema: type=object, properties=[items, page, page_size, total]
+- PaginatedVecPageSchema_PaymentSchema: type=object, properties=[items, page, page_size, total]
+- PaginatedVecPageSchema_PublicPaymentModelSchema: type=object, properties=[items, page, page_size, total]
+- PaginatedVecPageSchema_WebhookSchema: type=object, properties=[items, page, page_size, total]
+- PartialChainUpdateSchema: type=object, properties=[active, block_lag, last_processed_block, logo_url, required_confirmations, rpc_urls, safe_lag, xpub]
+- PaymentSchema: type=object, properties=[amount_raw, block_hash, block_number, created_at, from, id, log_index, network, status, to, token, tx_hash]
+- PaymentStatusSchema: type=string, properties=[]
+- PermissionSchema: type=string, properties=[]
+- PublicInvoiceModelSchema: type=object, properties=[address, amount, created_at, expires_at, id, network, paid, status, token]
+- PublicPaymentModelSchema: type=object, properties=[amount, block_hash, block_number, created_at, from, id, network, status, to, token, tx_hash]
+- RevokeKeyResSchema: type=undefined, properties=[]
+- TokenConfigSchema: type=object, properties=[contract, decimals, logo_url, symbol]
+- TokenDataSchema: type=object, properties=[chain_id, contract, decimals, id, logo_url, symbol]
+- VecResponseSchema_ApiKeyRecordSchema: type=object, properties=[items]
+- VecResponseSchema_ChainDataSchema: type=object, properties=[items]
+- VecResponseSchema_TokenDataSchema: type=object, properties=[items]
+- WebhookConfigSchema: type=object, properties=[max_retries, secret, url]
+- WebhookEventSchema: type=undefined, properties=[]
+- WebhookSchema: type=object, properties=[attempts, created_at, id, invoice_id, max_retries, next_retry, payload, status, url]
+- WebhookStatusSchema: type=string, properties=[]
