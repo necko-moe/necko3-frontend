@@ -4,9 +4,17 @@
   </a>
   <h1>necko3-frontend</h1>
 
-  <a href="https://github.com/necko-moe/necko3-frontend/stargazers">
-    <img src="https://img.shields.io/github/stars/necko-moe/necko3-frontend?style=social" alt="GitHub stars">
-  </a>
+  <p align="center">
+    <a href="https://github.com/necko-moe/necko3-frontend/actions">
+      <img src="https://img.shields.io/github/actions/workflow/status/necko-moe/necko3-frontend/ci.yml?branch=main&style=flat-square" alt="CI Status">
+    </a>
+    <a href="https://opensource.org/licenses/MIT">
+      <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT">
+    </a>
+    <a href="https://github.com/necko-moe/necko3-frontend/stargazers">
+       <img src="https://img.shields.io/github/stars/necko-moe/frontend-backend?style=social" alt="GitHub stars">
+     </a>
+  </p>
 </div>
 
 ***
@@ -15,7 +23,7 @@
 
 **necko3-frontend** is the pretty face of the [necko3](https://github.com/necko-moe) project — a single-page admin panel that lets you manage your self-hosted crypto payment gateway without touching a single `curl` command _(unless you're into that)_.
 
-It talks exclusively to [necko3-backend](https://github.com/necko-moe/necko3-backend) endpoints that sit behind `X-API-Key` auth. Configure blockchains, add tokens, create invoices, watch payments roll in, and stalk your webhook deliveries — all from a warm, responsive UI that works just as well on your phone as it does on a 4K monitor.
+It talks exclusively to [necko3-backend](https://github.com/necko-moe/necko3-backend) endpoints that sit behind `API key` auth. Configure blockchains, add tokens, create invoices, watch payments roll in, and stalk your webhook deliveries — all from a warm, responsive UI that works just as well on your phone as it does on a 4K monitor.
 
 The whole thing is a static SPA. No server-side rendering, no Node runtime in production, no hidden backend magic. Build it once, throw the output into any web server, and she takes it from there.
 
@@ -177,9 +185,9 @@ Static output lands in `dist/` — serve it however you like.
 ## Contributing
 
 I'd be happy to see any feedback.<br />
-Found a bug? <a href=https://github.com/necko-moe/necko3-backend/issues/new>Open an Issue</a>.<br />
+Found a bug? <a href=https://github.com/necko-moe/necko3-frontend/issues/new>Open an Issue</a>.<br />
 Want to add a feature? Fork it and send a PR 
-(or just <a href=https://github.com/necko-moe/necko3-backend/issues/new>Open an Issue</a> and write whatever you want)
+(or just <a href=https://github.com/necko-moe/necko3-frontend/issues/new>Open an Issue</a> and write whatever you want)
 
 ## License
 
@@ -198,7 +206,7 @@ The project and all repositories are distributed under the **MIT License**. Feel
     </ul>
   <p>
     Broke but still want to help?
-    You can just <a href="https://github.com/necko-moe/necko3-backend/stargazers"><b>⭐ Star this repo</b></a> to show your love. It really helps!
+    You can just <a href="https://github.com/necko-moe/necko3-frontend/stargazers"><b>⭐ Star this repo</b></a> to show your love. It really helps!
   </p>
   <a href="https://github.com/necko-moe">
     <img src=".github/assets/necko3-2-200.png" alt="necko3 support banner" width="1024"/>
