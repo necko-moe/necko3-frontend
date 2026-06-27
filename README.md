@@ -28,7 +28,8 @@ The whole thing is a static SPA. No server-side rendering, no Node runtime in pr
 ### Features
 
 - **Session-only API key auth** — the key lives in `sessionStorage` and dies with the tab. No cookies, no tokens, no "remember me" footguns.
-- **Chain management** — add, edit, and delete blockchain networks. Configure your xpub, multiple RPC endpoints _(it will rotate through them if one goes down)_, confirmation thresholds, and block lag.
+- **API key management** — create, browse, and revoke API keys right from the panel. The raw key is shown once after creation and never again — copy it while you can.
+- **Chain management** — add, edit, and delete blockchain networks. Configure your xpub, multiple RPC endpoints _(it will rotate through them if one goes down)_, confirmation thresholds, block lag, and safe lag.
 - **Token configuration** — attach ERC-20 tokens (USDC, USDT, whatever your chain supports) to any network. Set the contract address, decimals, and you're done.
 - **Invoice lifecycle** — create invoices, monitor their status in real-time, cancel them if plans change, and generate [payment links](https://github.com/necko-moe/necko3-payment-page) for your customers.
 - **Invoice card export** — generate a shareable PNG card for any invoice, complete with a QR code, payment details, and a choice of light/dark theme and language.
@@ -86,8 +87,9 @@ The whole thing is a static SPA. No server-side rendering, no Node runtime in pr
 | `/getting-started` | Onboarding wizard: three steps from zero to first invoice. Also doubles as the "what is necko3?" page. |
 | `/chains` | Master-detail view for blockchain networks. Add a chain, configure RPCs, manage tokens — all without leaving the page. |
 | `/invoices` | Paginated invoice list with status/network/token filters. Create new invoices, view details, cancel, and copy payment links. |
-| `/payments` | Every payment attempt the system has seen. Filter by status, network, token, invoice, sender address, or block number. |
-| `/webhooks` | Webhook delivery log. Filter by status, event type, invoice, or URL. Inspect payloads, cancel stuck jobs. |
+| `/payments` | Every payment attempt the system has seen. Filter by status, network, token, sender address, or block number. |
+| `/webhooks` | Webhook delivery log. Filter by status, event type, invoice, or URL. Inspect payloads and retry metadata. |
+| `/api-keys` | Create and revoke API keys. Set a name, prefix (`sk_live` / `pk_live`), and granular permissions. The raw key is shown once on creation. |
 
 ## Installing and Launching
 
@@ -175,8 +177,9 @@ Static output lands in `dist/` — serve it however you like.
 ## Contributing
 
 I'd be happy to see any feedback.<br />
-Found a bug? <a href=https://github.com/necko-moe/necko3-frontend/issues/new>Open an Issue</a>.<br />
-Want to add a feature? Fork it and send a PR.
+Found a bug? <a href=https://github.com/necko-moe/necko3-backend/issues/new>Open an Issue</a>.<br />
+Want to add a feature? Fork it and send a PR 
+(or just <a href=https://github.com/necko-moe/necko3-backend/issues/new>Open an Issue</a> and write whatever you want)
 
 ## License
 
@@ -186,10 +189,16 @@ The project and all repositories are distributed under the **MIT License**. Feel
 
 <div align="center">
   <h1>SUPPORT PROJECT</h1>
-  <p>Want to make necko1 employed or donate enough for a Triple Whopper? Contact me -> <a href=https://t.me/everyonehio>Telegram</a> or <a href="mailto:meow@necko.moe">Mail me</a> (I rarely check that). I don't accept direct card transfers, just so you know</p>
+  <p>Want to make necko1 employed or donate enough for a Triple Whopper? Contact me -> <a href=https://t.me/everyonehio>Telegram</a> or <a href="mailto:meow@necko.moe">Mail me</a> (I rarely check that)</p>
+  <p>I don't accept direct card transfers, but you can feed me some stablecoins:</p>
+    <ul style="list-style-type: none; padding: 0;">
+      <li><b>USDT (TRC20):</b> <code>THcVNoNu3oaLfssbWbNxXK5rUsLfpPM35D</code></li>
+      <li><b>Anything in Ethereum / ERC-20:</b> <code>0x97D596eA81C09aC76a89D495b7bACa7660eb4c73</code></li>
+      <li><b>TON:</b> <code>UQDRX9xv1uMxUMe9kkeidWGDkORI4gDx076QIaejtQUjI</code></li>
+    </ul>
   <p>
     Broke but still want to help?
-    You can just <a href="https://github.com/necko-moe/necko3-frontend/stargazers"><b>⭐ Star this repo</b></a> to show your love. It really helps!
+    You can just <a href="https://github.com/necko-moe/necko3-backend/stargazers"><b>⭐ Star this repo</b></a> to show your love. It really helps!
   </p>
   <a href="https://github.com/necko-moe">
     <img src=".github/assets/necko3-2-200.png" alt="necko3 support banner" width="1024"/>
